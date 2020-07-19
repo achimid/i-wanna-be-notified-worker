@@ -1,0 +1,38 @@
+{
+  "name": "i-wanna-be-notified-worker",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node test.js",
+    "db-start": "docker-compose up -d"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/achimid/web-page-notify-api.git"
+  },
+  "author": "achimid",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/achimid/web-page-notify-api/issues"
+  },
+  "homepage": "https://github.com/achimid/web-page-notify-api#readme",
+  "dependencies": {
+    "amqplib": "^0.6.0",
+    "bcrypt": "^4.0.0",
+    "dotenv": "^8.2.0",
+    "fuse.js": "^4.0.4-beta",
+    "imgur-upload": "^0.1.2",
+    "mongoose": "^5.9.25",
+    "natural": "^0.6.3",
+    "puppeteer": "^2.1.1",
+    "puppeteer-extra": "^3.1.9",
+    "puppeteer-extra-plugin-adblocker": "^2.11.3",
+    "puppeteer-extra-plugin-stealth": "^2.4.9",
+    "random-http-useragent": "^1.1.20",
+    "string-template": "^1.0.0",
+    "uuid": "^8.2.0"
+  }
+}

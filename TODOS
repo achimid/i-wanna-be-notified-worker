@@ -1,0 +1,1 @@
+Ler de uma fila, processar, salvar execução, se necessário, criar nova execução na fila, postar na fila de processados quando terminar.
