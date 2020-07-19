@@ -17,6 +17,9 @@ const createVO = async (exec) => {
     if (!exec.options) exec.options = {}
     if (!exec.options.timeout) exec.options.timeout = process.env.DEFAULT_OPTIONS_TIMEOUT
     if (!exec.options.waitUntil) exec.options.waitUntil = process.env.DEFAULT_OPTIONS_WAIT_UNTIL
+    if (!exec.options.printscreen) exec.options.printscreen = process.env.DEFAULT_OPTIONS_PRINTSCREEN
+    if (!exec.options.printscreenFullPage) exec.options.printscreenFullPage = process.env.DEFAULT_OPTIONS_PRINTSCREEN_FULL_PAGE
+    
 
     return {...exec, uuid, startTime}  
 }

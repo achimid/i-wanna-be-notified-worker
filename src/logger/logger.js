@@ -10,11 +10,17 @@ module.exports = {
         let executionTime
         try {
             executionTime = (new Date().getTime() - vo.startTime.getTime()) + 'ms'
-            if (extra) console.log(uuid, level, executionTime, log, extra)    
-            console.log(uuid, level, executionTime, log)
+            if (extra) {
+                console.log(uuid, level, executionTime, log, extra)    
+            } else {
+                console.log(uuid, level, executionTime, log)
+            }
         } catch (error) {
-            if (extra) console.log(uuid, level, log, extra)    
-            console.log(uuid, level, log)
+            if (extra) {
+                console.log(uuid, level, log, extra)    
+            } else {
+                console.log(uuid, level, log)
+            }
         }
         buffer.push({uuid, executionTime, log, extra})        
     }

@@ -11,11 +11,16 @@ const data = {
         "$($('.latest-releases li')[2]).find('a').children().not('strong').remove().end().end().text()",
         "$($('.latest-releases li')[3]).find('a').children().not('strong').remove().end().end().text()",
         "$($('.latest-releases li')[4]).find('a').children().not('strong').remove().end().end().text()",
-        "document.querySelector('a').href"
+        // "document.querySelector('a').href"
     ],
     options: {        
         useJquery: true
-    }    
+    },
+    // filter: {
+    //     words: [
+    //         'Boruto',            
+    //     ]
+    // },
 }
 
 

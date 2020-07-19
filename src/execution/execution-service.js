@@ -2,10 +2,12 @@ const log = require('../logger/logger')
 const Execution = require('./execution-model')
 const scraper = require('./execution-scraper')
 const producer = require('./execution-producer')
+const commons = require('../utils/commons')
 
 const startExecution = async (data) => {
 
     return scraper.execute(data)
+        .then(applyFilter)
         .then(saveExecution)
         .then(notifyExecution)
         .then(createSubExecution)
@@ -22,22 +24,30 @@ const createSubExecution = (execution) => {
         return execution
     }    
 
-    log.info(execution, 'Creating new subExecution')
+    
     execution.extractedContent
         .filter(v => v)
-        .filter(isURL)
-        .map(content => {
-            return {
-                url: content,
-                scriptTarget: execution.scriptTarget,
-                scriptContent: execution.scriptContent,
-                level: (execution.level || 0) + 1,
-                options: execution.options,
-                uuid: execution.uuid
-            }
-        }).map(producer.postSubExecution)
+        .filter(commons.isURL)
+        .map(mapNewSubExecution(execution))
+        .map(postSubExecution)
 
     return execution
+}
+
+const postSubExecution = (execution) => {
+    log.info(execution, 'Creating new subExecution')
+    producer.postSubExecution(execution)
+}
+
+const mapNewSubExecution = (execution) => (content) => {
+    return {
+        url: content,
+        scriptTarget: execution.scriptTarget,
+        scriptContent: execution.scriptContent,
+        level: (execution.level || 0) + 1,
+        options: execution.options,
+        uuid: execution.uuid
+    }
 }
 
 const notifyExecution = async (execution) => {    
@@ -48,11 +58,28 @@ const notifyExecution = async (execution) => {
     return execution
 }
 
-const isURL = (str) => {
-    const urlRegex = '^(?:(?:http|https)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
-    const url = new RegExp(urlRegex, 'i');
-    return (str.length < 2083 && url.test(str));
+const applyFilter = (execution) => {
+    const { filter, extractedTarget } = execution
+
+    if (!filter || !filter.words.length) {
+        log.info(execution, 'Filter not applyed')
+        return execution
+    }
+    
+    let filterMatch
+    const { words, threshold} = filter
+    if (!commons.hasSimilarity(extractedTarget, words, threshold)) {
+        filterMatch = false
+        log.info(execution, `No similarity found, filter not match [${words}]`)
+    } else {
+        filterMatch = true
+        log.info(execution, `Similarity found, filter match [${words}]`)
+    }
+
+    return {...execution, filterMatch}    
 }
+
+
 
 module.exports = {
     startExecution

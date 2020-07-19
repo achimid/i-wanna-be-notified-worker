@@ -31,6 +31,13 @@ const schema = mongoose.Schema({
         printscreen: { type: Boolean },
         printscreenFullPage: { type: Boolean },
     },
+    filter: {
+        threshold: Number,
+        words: [{
+            type: String
+        }]
+    },
+    filterMatch: { type: Boolean },
     scriptContent: [{ 
         type: String
     }],
