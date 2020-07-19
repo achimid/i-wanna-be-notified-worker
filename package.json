@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/achimid/web-page-notify-api.git"
+    "url": "git+https://github.com/achimid/i-wanna-be-notified-worker.git"
   },
   "author": "achimid",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/achimid/web-page-notify-api/issues"
+    "url": "https://github.com/achimid/i-wanna-be-notified-worker/issues"
   },
-  "homepage": "https://github.com/achimid/web-page-notify-api#readme",
+  "homepage": "https://github.com/achimid/i-wanna-be-notified-worker#readme",
   "dependencies": {
     "amqplib": "^0.6.0",
     "bcrypt": "^5.0.0",
