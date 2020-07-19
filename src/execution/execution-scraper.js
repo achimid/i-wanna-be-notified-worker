@@ -6,12 +6,13 @@ const ImagemUtils = require('../utils/imagem-util')
 const RandomHttpUserAgent = require('random-http-useragent')
 
 const createVO = async (exec) => {
-    const uuid = v4()
+    const uuid = exec.uuid ? exec.uuid : v4()
     const startTime = new Date()
     
     log.info({...exec, uuid, startTime} , 'Starting extraction')
 
     if (!exec.scriptTarget) exec.scriptTarget = process.env.DEFAULT_JS_TARGET_SCRIPT
+    if (!exec.level) exec.level = 0
     
     if (!exec.options) exec.options = {}
     if (!exec.options.timeout) exec.options.timeout = process.env.DEFAULT_OPTIONS_TIMEOUT

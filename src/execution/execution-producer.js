@@ -1,7 +1,13 @@
 const queue = require("../utils/queue")
 
-const notifyComplete = (data) => queue.sendToQueue("EXECUTION_COMPLETED", data)
+const postNotifyComplete = (data) => queue.sendToQueue("EXECUTION_COMPLETED", data)
+
+const postSubExecution = (data) => queue.sendToQueue("EXECUTION_SEQUENCIAL", data)
+
+const postExecution = (data) => queue.sendToQueue("EXECUTION_INCOMING", data)
 
 module.exports = {
-    notifyComplete
+    postNotifyComplete,
+    postSubExecution,
+    postExecution
 }

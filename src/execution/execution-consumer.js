@@ -9,4 +9,10 @@ module.exports = () => {
         service.startExecution(data).then(ack)
     }, parseInt(process.env.CONCURENT_QUEUE_EXECUTIONS))
 
+
+    queue.consumeFromQueueWithAck("EXECUTION_SEQUENCIAL", (message, ack) => {
+        const data = JSON.parse(message.content.toString())
+        service.startExecution(data).then(ack)
+    }, parseInt(process.env.CONCURENT_QUEUE_SUB_EXECUTIONS))
+
 }

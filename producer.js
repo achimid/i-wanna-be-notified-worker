@@ -10,7 +10,8 @@ const data = {
         "$($('.latest-releases li')[1]).find('a').children().not('strong').remove().end().end().text()",
         "$($('.latest-releases li')[2]).find('a').children().not('strong').remove().end().end().text()",
         "$($('.latest-releases li')[3]).find('a').children().not('strong').remove().end().end().text()",
-        "$($('.latest-releases li')[4]).find('a').children().not('strong').remove().end().end().text()"
+        "$($('.latest-releases li')[4]).find('a').children().not('strong').remove().end().end().text()",
+        "document.querySelector('a').href"
     ],
     options: {        
         useJquery: true
@@ -20,21 +21,21 @@ const data = {
 
 // setInterval(() => {
     queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
-    queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
+    // queue.sendToQueue("EXECUTION_INCOMING", data)
 // }, 10000)
 

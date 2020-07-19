@@ -5,14 +5,16 @@ let buffer = []
 
 module.exports = {
     info: (vo, log, extra) => {
-        const uuid = vo.uuid
+        const uuid = vo.uuid ? vo.uuid : vo
+        const level = `[${vo.level || 0}]`
         let executionTime
         try {
             executionTime = (new Date().getTime() - vo.startTime.getTime()) + 'ms'
-            if (extra) console.log(uuid, executionTime, log, extra)    
-            console.log(uuid, executionTime, log)
+            if (extra) console.log(uuid, level, executionTime, log, extra)    
+            console.log(uuid, level, executionTime, log)
         } catch (error) {
-            console.log(...arguments)
+            if (extra) console.log(uuid, level, log, extra)    
+            console.log(uuid, level, log)
         }
         buffer.push({uuid, executionTime, log, extra})        
     }
