@@ -1,4 +1,4 @@
-const log = require('../utils/logger')
+const log = require('../logger/logger')
 const { v4 } = require('uuid')
 const crypto = require('crypto');
 const fetch = require('node-fetch');
@@ -7,9 +7,9 @@ const RandomHttpUserAgent = require('random-http-useragent')
 
 const createVO = async (exec) => {
     const uuid = v4()
-    log.info(uuid, 'Starting extraction')
-
     const startTime = new Date()
+    
+    log.info({...exec, uuid, startTime} , 'Starting extraction')
 
     if (!exec.scriptTarget) exec.scriptTarget = process.env.DEFAULT_JS_TARGET_SCRIPT
     
@@ -29,7 +29,7 @@ const createNewPage = async (vo) => {
 }
 
 const setUserAgent = async (vo) => {
-    if (!vo.enableUserAgentRandom) {
+    if (!vo.options.enableUserAgentRandom) {
         log.info(vo, 'UserAgentRandom ignored')
         return vo
     }
@@ -167,28 +167,28 @@ const closePage = async (vo) => {
 
 const postExecute = async (vo) => {
     const endTime = new Date()
-    const executionTime = (endTime.getTime() - vo.startTime.getTime())
-    log.info(vo, `Execution time: ${executionTime}ms`)
+    const executionTime = (endTime.getTime() - vo.startTime.getTime()) + 'ms'
+    log.info(vo, `Execution time: ${executionTime}`)
         
-    let responseTargetNormalized = vo.responseTarget
+    let extractedTargetNormalized = vo.extractedTarget
 
     log.info(vo, `Normalizando responseTarget`)
-    if (typeof responseTargetNormalized === 'string' || responseTargetNormalized instanceof String) {
-        responseTargetNormalized = responseTarget.trim()
+    if (typeof extractedTargetNormalized === 'string' || extractedTargetNormalized instanceof String) {
+        extractedTargetNormalized = extractedTargetNormalized.trim()
     }
     
     log.info(vo, `Checking possible errors`)
     const isSuccess = !(vo.errorOnExecuteScriptTarget || vo.errorOnPrintPage || vo.errorOnUploadPrintscreen)
     
     log.info(vo, `Gerando hashTarget`)
-    const hashTarget = crypto.createHash('md5').update(JSON.stringify({data: responseTargetNormalized})).digest("hex")    
+    const hashTarget = crypto.createHash('md5').update(JSON.stringify({data: extractedTargetNormalized})).digest("hex")    
     
     // Adição de possiveis logs
 
     log.info(vo, `End of execution`)
     // log.info(vo, vo.extractedTarget)
 
-    return {...vo, endTime, executionTime, responseTargetNormalized, isSuccess, hashTarget}
+    return {...vo, endTime, executionTime, extractedTargetNormalized, isSuccess, hashTarget}
 }
 
 const execute = async (execution) => {
