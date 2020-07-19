@@ -1,7 +1,7 @@
 const imgur = require('imgur-upload')
 const fs = require('fs')
 
-imgur.setClientID(process.env.IMGUR_CLIENT_ID);
+imgur.setClientID(process.env.IMGUR_CLIENT_ID)
 
 const uploadImage = (filePath) => new Promise((resolve, reject) => {
     imgur.upload(filePath, (err, res) => {

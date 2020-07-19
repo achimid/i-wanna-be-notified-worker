@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose")
 
 module.exports = () => {
     console.info('Iniciando banco de dados...')
@@ -13,9 +13,9 @@ module.exports = () => {
     const db = mongoose.connection
     
     db.on("error", () => {
-        console.error("Erro ao conextar no banco de dados...");
+        console.error("Erro ao conextar no banco de dados...")
     })
     db.once("open", () => {
-        console.info("Banco de dados conectado com sucesso...");
+        console.info("Banco de dados conectado com sucesso...")
     })
 }

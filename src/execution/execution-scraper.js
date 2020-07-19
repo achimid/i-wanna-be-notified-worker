@@ -1,7 +1,7 @@
 const log = require('../logger/logger')
 const { v4 } = require('uuid')
-const crypto = require('crypto');
-const fetch = require('node-fetch');
+const crypto = require('crypto')
+const fetch = require('node-fetch')
 const ImagemUtils = require('../utils/imagem-util')
 const RandomHttpUserAgent = require('random-http-useragent')
 
@@ -99,7 +99,7 @@ const executeScriptTarget = async (vo) => {
 }
 
 const executeScriptTargetRetry = async (vo) => {
-    await fetch(vo.url).then(res => res.text()).then((content) => vo.page.setContent(content));
+    await fetch(vo.url).then(res => res.text()).then((content) => vo.page.setContent(content))
     return vo
 }
 

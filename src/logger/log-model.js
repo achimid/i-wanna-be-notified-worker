@@ -10,7 +10,7 @@ const schema = mongoose.Schema({
 
 const MONTH = 60 * 60 * 24
 
-schema.index({ createdAt: 1 }, { expireAfterSeconds : MONTH * 3 });
+schema.index({ createdAt: 1 }, { expireAfterSeconds : MONTH * 3 })
 
 const ExecutionLog = mongoose.model("logs", schema)
 module.exports = ExecutionLog
