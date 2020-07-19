@@ -5,7 +5,7 @@ const os = require('os');
 if (cluster.isMaster) {
   // Get total CPU cores.
   // const cpuCount = os.cpus().length;
-  const cpuCount = 4;
+  const cpuCount = 2;
 
   // Spawn a worker for every core.
   for (let j = 0; j < cpuCount; j++) {
