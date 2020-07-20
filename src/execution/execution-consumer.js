@@ -1,7 +1,7 @@
 const queue = require("../utils/queue")
 const service = require('./execution-service')
 
-module.exports = () => {
+module.exports = async () => {
     console.info('Inicializando execution consumer')
     
     queue.consumeFromQueueWithAck("EXECUTION_INCOMING", (message, ack) => {

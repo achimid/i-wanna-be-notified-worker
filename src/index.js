@@ -9,10 +9,9 @@ const cors = require('cors')
 const express = require('express')
 const app = express()
 
-browserInit()
 databaseInit()
-
-setTimeout(consumerInit, 2000)
+    .then(browserInit)
+    .then(consumerInit)
 
 app.use(cors())
 app.use(express.json())

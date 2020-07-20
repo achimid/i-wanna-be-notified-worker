@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-module.exports = () => {
+module.exports = async () => {
     console.info('Iniciando banco de dados...')
 
     mongoose.connect(process.env.MONGO_DB_CONNECTION, {
