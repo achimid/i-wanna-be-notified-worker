@@ -59,9 +59,6 @@ const schema = mongoose.Schema({
     executionTime: { 
         type: String
     },
-    message: { 
-        type: String
-    },
     printscreenLink: {
         type: String
     },
