@@ -15,7 +15,9 @@ const startExecution = async (data) => {
 }
 
 const saveExecution = async (execution) => {
-    return new Execution(execution).save()
+    return new Execution(execution)
+        .save()
+        .catch((err) => log.info(execution, err))
 }
 
 const createSubExecution = (execution) => {

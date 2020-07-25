@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const fetch = require('node-fetch')
 const ImagemUtils = require('../utils/imagem-util')
 const RandomHttpUserAgent = require('random-http-useragent')
+const {isTrue, isFalse} = require('../utils/commons')
 
 const createVO = async (exec) => {
     const uuid = exec.uuid ? exec.uuid : v4()
@@ -33,7 +34,7 @@ const createNewPage = async (vo) => {
 }
 
 const setUserAgent = async (vo) => {
-    if (!vo.options.enableUserAgentRandom) {
+    if (isFalse(vo.options.enableUserAgentRandom)) {
         log.info(vo, 'UserAgentRandom ignored')
         return vo
     }
@@ -63,17 +64,17 @@ const gotoUrl = async (vo) => {
 }
 
 const optionsPosGoto = async (vo) => {
-    if (vo.options.useJquery) {
+    if (isTrue(vo.options.useJquery)) {
         log.info(vo, 'Adding JQuery script tag')
         await vo.page.addScriptTag({ url: process.env.JQUERY_URL_INJECTION })
     }
 
-    if (vo.options.scriptTagUrl) {
+    if (isTrue(vo.options.scriptTagUrl)) {
         log.info(vo, 'Adding others script tag', vo.options.scriptTagUrl)
         await vo.page.addScriptTag({ url: vo.scriptTagUrl })
     }
 
-    if (vo.options.waitTime) {
+    if (isTrue(vo.options.waitTime)) {
         log.info(vo, `Waiting for ${vo.options.waitTime}ms option`)
         await vo.page.waitFor(vo.options.waitTime)
     }
@@ -121,7 +122,7 @@ const executeScriptContent = async (vo) => {
 }
 
 const printPage = async (vo) => {
-    if (!vo.options.printscreen && !vo.options.printscreenFullPage) {
+    if (isFalse(vo.options.printscreen) && isFalse(vo.options.printscreenFullPage)) {
         log.info(vo, `Printscreen page ignored`)
         return vo
     }

@@ -34,8 +34,14 @@ const isURL = (str) => {
     return (str.length < 2083 && url.test(str))
 }
 
+const isTrue = (v) => v == 'true' || v == true
+
+const isFalse = (v) => v == 'false' || v == false || v == '' || v == undefined || v == null
+
 module.exports = {
+    isTrue,
+    isFalse,
     isURL,
     findSimilarity,
-    hasSimilarity    
+    hasSimilarity
 }
