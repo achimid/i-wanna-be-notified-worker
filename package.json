@@ -5,10 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "prod": "node src/index-cluster.js",
-    "dev": "nodemon src/index.js",
-    "test": "node test.js",
-    "db-start": "docker-compose up -d"
+    "prod": "node src/index-cluster.js"
   },
   "repository": {
     "type": "git",
