@@ -1,31 +1,32 @@
 const Fuse = require('fuse.js')
 const natural = require('natural')
+const log = require('../logger/logger')
 const tokenizer = new natural.WordTokenizer()
 
-const findSimilarity = (fullText, wordsSearch, threshold = 0.1) => {
-
-    const normalizedFullText = fullText.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase()
-    const normalizedWordsSearch = wordsSearch.map(w => w.normalize('NFD').toLowerCase())
-
-    const wordsText = tokenizer.tokenize(normalizedFullText).map(word => {return {word}})
-    
-    var options = {
-        threshold,
-        keys: ['word']
-    }
-
-    const fuse = new Fuse(wordsText, options)
+const findSimilarity = (uuid, fullText, wordsSearch, threshold = 0.1) => {
 
     try {
+        const normalizedFullText = fullText.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase()
+        const normalizedWordsSearch = wordsSearch.map(w => w.normalize('NFD').toLowerCase())
+
+        const wordsText = tokenizer.tokenize(normalizedFullText).map(word => {return {word}})
+        
+        var options = {
+            threshold,
+            keys: ['word']
+        }
+
+        const fuse = new Fuse(wordsText, options)
+    
         return [...new Set(normalizedWordsSearch.map(key => fuse.search(key)).flat().map(({word}) => word))]        
     } catch (error) {
-        console.info(error)
+        log.info(uuid, error)
         return []
     }
 }
 
-const hasSimilarity = (fullText, wordsSearch, threshold) => 
-    findSimilarity(fullText, wordsSearch, threshold).length > 0
+const hasSimilarity = (uuid, fullText, wordsSearch, threshold) => 
+    findSimilarity(uuid, fullText, wordsSearch, threshold).length > 0
 
 
 const isURL = (str) => {

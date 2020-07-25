@@ -74,7 +74,7 @@ const applyFilter = (execution) => {
     
     let filterMatch
     const { words, threshold} = filter
-    if (!commons.hasSimilarity(extractedTarget, words, threshold)) {
+    if (!commons.hasSimilarity(execution.uuid, extractedTarget, words, threshold)) {
         filterMatch = false
         log.info(execution, `No similarity found, filter not match [${words}]`)
     } else {
