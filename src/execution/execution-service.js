@@ -50,14 +50,16 @@ const mapNewSubExecution = (execution) => (content) => {
         scriptContent: execution.scriptContent,
         level: (execution.level || 0) + 1,
         options: execution.options,
-        uuid: execution.uuid
+        uuid: execution.uuid,
+        monitoringId: execution.monitoringId
     }
 }
 
 const notifyExecution = async (execution) => {    
     producer.postNotifyComplete({ 
         uuid: execution.uuid, 
-        id: execution.id 
+        id: execution.id,
+        monitoringId: execution.monitoringId
     })
     return execution
 }

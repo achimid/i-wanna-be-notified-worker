@@ -12,6 +12,9 @@ const schema = mongoose.Schema({
     uuid: { 
         type: String
     },
+    monitoringId: { 
+        type: String
+    },
     level: { 
         type: Number
     },
