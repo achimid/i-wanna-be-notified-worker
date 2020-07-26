@@ -18,12 +18,14 @@ const findSimilarity = (uuid, fullText, wordsSearch, threshold = 0.1) => {
 
         const fuse = new Fuse(wordsText, options)
     
-        return [...new Set(normalizedWordsSearch.map(key => fuse.search(key)).flat().map(({word}) => word))]        
+        return [...new Set(manualFlat(normalizedWordsSearch.map(key => fuse.search(key))).map(({word}) => word))]        
     } catch (error) {
         log.info(uuid, error)
         return []
     }
 }
+
+const manualFlat = (arrays) => [].concat.apply([], arrays)
 
 const hasSimilarity = (uuid, fullText, wordsSearch, threshold) => 
     findSimilarity(uuid, fullText, wordsSearch, threshold).length > 0
