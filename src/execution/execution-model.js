@@ -47,6 +47,12 @@ const schema = mongoose.Schema({
     hashTarget: {
         type: String
     },
+    hashTargetChanged: {
+        type: Boolean
+    },
+    hashTargetUnique: {
+        type: Boolean
+    },
     extractedTarget: {
         type: String
     },

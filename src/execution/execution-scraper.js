@@ -50,7 +50,7 @@ const setUserAgent = async (vo) => {
     return {...vo, userAgentRandom}
 }
 
-const optionsPreGoto = (vo) => {
+const optionsPreGoto = async (vo) => {
     return vo
 }
 
@@ -100,7 +100,15 @@ const executeScriptTarget = async (vo) => {
 }
 
 const executeScriptTargetRetry = async (vo) => {
-    await fetch(vo.url).then(res => res.text()).then((content) => vo.page.setContent(content))
+    if (vo.errorOnExecuteScriptTarget) {
+        log.info(vo, `Fetching page manually - Starging - Page navigation retry`)
+        await fetch(vo.url)
+            .then(res => res.text())
+            .then((content) => vo.page.setContent(content))
+        log.info(vo, `Fetching page manually - Ending - Page navigation retry`)
+        
+        vo = await optionsPosGoto(vo)
+    }
     return vo
 }
 

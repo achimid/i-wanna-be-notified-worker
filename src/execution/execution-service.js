@@ -8,13 +8,53 @@ const startExecution = async (data) => {
 
     return scraper.execute(data)
         .then(applyFilter)
+        .then(applyChangedUnique)
         .then(saveExecution)
         .then(notifyExecution)
         .then(createSubExecution)
 
 }
 
+const applyChangedUnique = async (execution) => Promise.all([
+        applyChanged(execution),
+        applyUnique(execution)
+    ]).then(([hashTargetChanged, hashTargetUnique]) => {
+        execution.hashTargetChanged = hashTargetChanged
+        execution.hashTargetUnique = hashTargetUnique
+        return execution
+    })
+    
+
+const applyChanged = async (execution) => {
+    log.info(execution, 'Calculation changed hash')
+
+    const { hashTarget, monitoringId, level } = execution
+    const lastExecution = await Execution.find({monitoringId, level}).sort({createdAt: -1}).limit(1).lean()
+
+    let hashTargetChanged = false
+    if (lastExecution.length > 0) {
+        hashTargetChanged = lastExecution[0].hashTarget == hashTarget
+    }
+
+    log.info(execution, `Changed hash calculated, hashTargetChanged=${hashTargetChanged}`)
+    return hashTargetChanged
+}
+
+const applyUnique = async (execution) => {
+    log.info(execution, 'Calculation unique hash')
+
+    const { hashTarget } = execution
+    const findedExecution = await Execution.findOne({ hashTarget }).lean()
+
+    const hashTargetUnique = !findedExecution
+
+    log.info(execution, `Changed unique calculated, hashTargetUnique=${hashTargetUnique}`)
+    return hashTargetUnique
+}
+
 const saveExecution = async (execution) => {
+    log.info(execution, 'Save execution')
+
     delete execution._id
     return new Execution(execution)
         .save()
@@ -29,7 +69,7 @@ const createSubExecution = (execution) => {
     }    
 
     
-    execution.extractedContent
+    (execution.extractedContent || [])
         .filter(v => v)
         .filter(commons.isURL)
         .map(mapNewSubExecution(execution))
