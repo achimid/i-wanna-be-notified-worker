@@ -56,7 +56,6 @@ const saveExecution = async (execution) => {
     return new Execution(execution)
         .save()
         .catch((err) => log.info(execution, err))
-        .then(() => execution)
 }
 
 const createSubExecution = (execution) => {
@@ -82,20 +81,16 @@ const postSubExecution = (execution) => {
 
 const mapNewSubExecution = (execution) => (content) => {
     return {
+        ...execution,
         url: content,
-        scriptTarget: execution.scriptTarget,
-        scriptContent: execution.scriptContent,
-        level: execution.level + 1,
-        options: execution.options,
-        uuid: execution.uuid,
-        monitoringId: execution.monitoringId
+        level: execution.level + 1        
     }
 }
 
 const notifyExecution = async (execution) => {    
     producer.postNotifyComplete({ 
-        uuid: execution.uuid, 
         id: execution.id,
+        uuid: execution.uuid, 
         level: execution.level,
         monitoringId: execution.monitoringId
     })
