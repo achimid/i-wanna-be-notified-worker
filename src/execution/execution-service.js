@@ -31,10 +31,7 @@ const applyChanged = async (execution) => {
     const { hashTarget, monitoringId, level } = execution
     const lastExecution = await Execution.find({monitoringId, level}).sort({createdAt: -1}).limit(1).lean()
 
-    let hashTargetChanged = false
-    if (lastExecution.length > 0) {
-        hashTargetChanged = lastExecution[0].hashTarget == hashTarget
-    }
+    let hashTargetChanged = lastExecution.length > 0 ? lastExecution[0].hashTarget != hashTarget : false
 
     log.info(execution, `Changed hash calculated, hashTargetChanged=${hashTargetChanged}`)
     return hashTargetChanged
