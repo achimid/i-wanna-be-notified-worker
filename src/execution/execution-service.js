@@ -29,7 +29,7 @@ const applyChanged = async (execution) => {
     log.info(execution, 'Calculation changed hash')
 
     const { hashTarget, monitoringId, level } = execution
-    const lastExecution = await Execution.find({monitoringId, level}).sort({createdAt: -1}).limit(1).lean()
+    const lastExecution = await Execution.find({monitoringId, level}).sort({_id: -1}).limit(1).lean()
 
     let hashTargetChanged = lastExecution.length > 0 ? lastExecution[0].hashTarget != hashTarget : false
 
@@ -53,9 +53,11 @@ const saveExecution = async (execution) => {
     log.info(execution, 'Save execution')
 
     delete execution._id
-    return new Execution(execution)
-        .save()
+    const newExecution = new Execution(execution)
+
+    return newExecution.save()
         .catch((err) => log.info(execution, err))
+        .finally(() => newExecution)
 }
 
 const createSubExecution = (execution) => {
