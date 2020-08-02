@@ -55,9 +55,14 @@ const saveExecution = async (execution) => {
     delete execution._id
     const newExecution = new Execution(execution)
 
-    return newExecution.save()
-        .catch((err) => log.info(execution, err))
-        .finally(() => newExecution)
+    try {
+        await newExecution.save()
+        log.info(execution, 'Execution saved')
+    } catch (error) {
+        log.info(execution, 'Error on save execution', err)
+    }
+
+    return newExecution.toJSON()
 }
 
 const createSubExecution = (execution) => {
