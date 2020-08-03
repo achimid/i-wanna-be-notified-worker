@@ -58,7 +58,7 @@ const saveExecution = async (execution) => {
     try {
         await newExecution.save()
         log.info(execution, 'Execution saved')
-    } catch (error) {
+    } catch (err) {
         log.info(execution, 'Error on save execution', err)
     }
 

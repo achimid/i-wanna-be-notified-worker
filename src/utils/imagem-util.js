@@ -8,7 +8,7 @@ const uploadImage = (filePath) => new Promise((resolve, reject) => {
         try {
             if (err) return reject(err)
             if (res.data) return resolve({link: res.data.link, res})
-            return resolve({link: res, res})            
+            return resolve({link: res.detail, res})            
         } catch (err) {
             return reject(err)
         }
