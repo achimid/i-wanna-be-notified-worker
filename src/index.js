@@ -1,9 +1,9 @@
 require('dotenv').config()
 
-const databaseInit = require('./config/database')
 const browserInit = require('./config/puppeteer')
-const consumerInit = require('./execution/execution-consumer')
 const healthcheck = require('./config/healthcheck')
+const { databaseInit } = require('./config/database')
+const consumerInit = require('./execution/execution-consumer')
 
 const cors = require('cors')
 const express = require('express')
