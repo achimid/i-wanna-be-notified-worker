@@ -71,7 +71,9 @@ const createSubExecution = (execution) => {
         return execution
     }
     
-    if (execution.errorOnLevelMax) {
+
+    if (execution.options.levelMax && execution.level >= execution.options.levelMax) {        
+        log.info(execution, 'Sub Execution limit reached')
         return execution
     }
 

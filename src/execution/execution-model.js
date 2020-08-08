@@ -72,7 +72,6 @@ const schema = mongoose.Schema({
     printscreenLink: {
         type: String
     },
-    errorOnLevelMax: { type: Object },
     errorOnExecuteScriptTarget: { type: Object },
     errorOnPrintPage: { type: Object },
     errorOnUploadPrintscreen: { type: Object },

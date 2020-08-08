@@ -23,20 +23,13 @@ const createVO = async (exec) => {
     if (!exec.options.waitUntil) exec.options.waitUntil = process.env.DEFAULT_OPTIONS_WAIT_UNTIL
     if (!exec.options.printscreen) exec.options.printscreen = process.env.DEFAULT_OPTIONS_PRINTSCREEN
     if (!exec.options.printscreenFullPage) exec.options.printscreenFullPage = process.env.DEFAULT_OPTIONS_PRINTSCREEN_FULL_PAGE
-
-    
+   
 
     return exec
 }
 
 const preValidate = async (vo) => {
-
-    if (vo.options.levelMax && vo.level > vo.options.levelMax) {        
-        vo.errorOnLevelMax = 'Level max reached, execution stoped'
-        vo.isSuccess = false
-        throw vo.errorOnLevelMax
-    }
-    
+        
     return vo
 }
 
