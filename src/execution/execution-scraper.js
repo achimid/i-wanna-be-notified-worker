@@ -54,8 +54,14 @@ const setUserAgent = async (vo) => {
     const userAgentRandom = await RandomHttpUserAgent.get()
     log.info(vo, 'UserAgent created', userAgentRandom)
 
-    await page.setUserAgent(userAgentRandom)
-    log.info(vo, 'UserAgent added')
+    try {
+        log.info(vo, 'Adding userAgent')
+        await vo.page.setUserAgent(userAgentRandom)    
+        log.info(vo, 'UserAgent added')
+    } catch (errorOnAddUserAgent) {
+        log.info(vo, 'Error on add userAgent')        
+        return {...vo, errorOnAddUserAgent}
+    }
 
     return {...vo, userAgentRandom}
 }
@@ -98,6 +104,8 @@ const executeScriptTarget = async (vo) => {
         return vo
 
     try {
+
+
         log.info(vo, `Executing scriptTarget`)
         const extractedTarget = await vo.page.evaluate(vo.scriptTarget)
 
@@ -105,6 +113,12 @@ const executeScriptTarget = async (vo) => {
         return {...vo, extractedTarget}
     } catch (errorOnExecuteScriptTarget) {
         log.info(vo, `Error on execute ScriptTarget`, errorOnExecuteScriptTarget)
+
+        if (vo.level > 0) {
+            log.info(vo, `ScriptTarget execution ignored because of level`)
+            return {...vo, extractedTarget: '[No Content]'}
+        }
+                
         return {...vo, errorOnExecuteScriptTarget }
     }
 }
