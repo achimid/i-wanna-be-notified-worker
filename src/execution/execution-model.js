@@ -33,7 +33,8 @@ const schema = mongoose.Schema({
         waitTime: { type: Number },
         printscreen: { type: Boolean },
         printscreenFullPage: { type: Boolean },
-        levelMax: { type: Number }
+        levelMax: { type: Number },
+        proxy: { type: String }        
     },
     filter: {
         threshold: Number,

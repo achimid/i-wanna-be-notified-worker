@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const fetch = require('node-fetch')
 const ImagemUtils = require('../utils/imagem-util')
 const RandomHttpUserAgent = require('random-http-useragent')
+const useProxy = require('puppeteer-page-proxy')
 const {isTrue, isFalse} = require('../utils/commons')
 
 const createVO = async (exec) => {
@@ -67,6 +68,18 @@ const setUserAgent = async (vo) => {
 }
 
 const optionsPreGoto = async (vo) => {
+
+    if (vo.options.proxy) {
+        try {
+            log.info(vo, 'Adding proxy')
+            await useProxy(vo.page, vo.options.proxy)
+            log.info(vo, 'Proxy added')
+        } catch (errorOnAddProxy) {
+            log.info(vo, 'Error on add proxy', errorOnAddProxy)        
+            return {...vo, errorOnAddProxy}
+        }        
+    }
+
     return vo
 }
 
@@ -93,6 +106,11 @@ const optionsPosGoto = async (vo) => {
     if (isTrue(vo.options.waitTime)) {
         log.info(vo, `Waiting for ${vo.options.waitTime}ms option`)
         await vo.page.waitFor(vo.options.waitTime)
+    }
+
+    if (vo.options.proxy) {
+        log.info(vo, `Removing proxy`)
+        try { await useProxy(vo.page, null) } catch (e) {}
     }
 
     return vo

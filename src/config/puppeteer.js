@@ -5,7 +5,7 @@ const adblockerPlugin = require('puppeteer-extra-plugin-adblocker')
 puppeteer.use(stealthPlugin())
 puppeteer.use(adblockerPlugin({ blockTrackers: true }))
 
-const dfUserAg = process.env.DEFAULT_USER_AGENT
+const proxy = process.env.PROXY_SERVER
 
 const browserInit = async () => {
     console.info('Inicializando browser...')    
@@ -16,10 +16,10 @@ const browserInit = async () => {
                 '--no-sandbox', 
                 '--disable-setuid-sandbox',
                 '--disable-infobars',
+                '--disable-web-security',
                 '--ignore-certifcate-errors',
                 '--ignore-certifcate-errors-spki-list',
-                dfUserAg != '' ? `--user-agent="${dfUserAg}"`: '',
-                // '--proxy-server=https://116.196.85.150:3128'
+                proxy ? `--proxy-server=${proxy}` : ''
             ],
             userDataDir: '/tmp/pp'
         })
