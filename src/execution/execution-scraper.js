@@ -10,7 +10,10 @@ const createVO = async (exec) => {
     const uuid = exec.uuid ? exec.uuid : v4()
     const startTime = new Date()
     
-    log.info({...exec, uuid, startTime} , 'Starting extraction')
+    exec.uuid = uuid
+    exec.startTime = startTime
+
+    log.info(exec , 'Starting extraction')
 
     if (!exec.scriptTarget) exec.scriptTarget = process.env.DEFAULT_JS_TARGET_SCRIPT
     if (!exec.level) exec.level = 0
@@ -20,10 +23,24 @@ const createVO = async (exec) => {
     if (!exec.options.waitUntil) exec.options.waitUntil = process.env.DEFAULT_OPTIONS_WAIT_UNTIL
     if (!exec.options.printscreen) exec.options.printscreen = process.env.DEFAULT_OPTIONS_PRINTSCREEN
     if (!exec.options.printscreenFullPage) exec.options.printscreenFullPage = process.env.DEFAULT_OPTIONS_PRINTSCREEN_FULL_PAGE
+
     
 
-    return {...exec, uuid, startTime}  
+    return exec
 }
+
+const preValidate = async (vo) => {
+
+    if (vo.options.levelMax && vo.level > vo.options.levelMax) {        
+        vo.errorOnLevelMax = 'Level max reached, execution stoped'
+        vo.isSuccess = false
+        throw vo.errorOnLevelMax
+    }
+    
+    return vo
+}
+
+
 
 const createNewPage = async (vo) => {
     log.info(vo, 'Creating new page')
@@ -120,7 +137,8 @@ const executeScriptContent = async (vo) => {
             const result = await vo.page.evaluate(script)
             return Promise.resolve(result)
         } catch (error) {
-            return Promise.resolve(error)
+            log.info(vo, `Erro on execute ScriptContent`, { script, message: error.message })
+            return Promise.resolve(`[No content]`)
         }    
     }))
 
@@ -199,7 +217,6 @@ const postExecute = async (vo) => {
     // Adição de possiveis logs
 
     log.info(vo, `End of execution`)
-    // log.info(vo, vo.extractedTarget)
 
     return {...vo, endTime, executionTime, extractedTargetNormalized, isSuccess, hashTarget}
 }
@@ -211,6 +228,7 @@ const execute = async (execution) => {
     
     try {
         
+        vo = await preValidate(vo)
         vo = await createNewPage(vo)
         vo = await setUserAgent(vo)
         vo = await optionsPreGoto(vo)
@@ -224,7 +242,7 @@ const execute = async (execution) => {
         vo = await postExecute(vo)
         
     } catch (unespectedError) {
-        log.info(vo, 'UnespectedError', unespectedError)
+        log.info(vo, 'UnespectedError: ', unespectedError)
         return {...vo, unespectedError}
     }
 

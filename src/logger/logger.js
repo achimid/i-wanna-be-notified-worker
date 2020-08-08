@@ -22,7 +22,7 @@ module.exports = {
                 console.log(uuid, level, log)
             }
         }
-        buffer.push({uuid, executionTime, log, extra})        
+        buffer.push({uuid, executionTime, log, extra, level: vo.level || 0})        
     }
 }
 

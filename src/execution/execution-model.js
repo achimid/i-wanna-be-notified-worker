@@ -33,6 +33,7 @@ const schema = mongoose.Schema({
         waitTime: { type: Number },
         printscreen: { type: Boolean },
         printscreenFullPage: { type: Boolean },
+        levelMax: { type: Number }
     },
     filter: {
         threshold: Number,
@@ -71,6 +72,7 @@ const schema = mongoose.Schema({
     printscreenLink: {
         type: String
     },
+    errorOnLevelMax: { type: Object },
     errorOnExecuteScriptTarget: { type: Object },
     errorOnPrintPage: { type: Object },
     errorOnUploadPrintscreen: { type: Object },

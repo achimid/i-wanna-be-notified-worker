@@ -69,7 +69,11 @@ const createSubExecution = (execution) => {
     if (execution.level >= process.env.EXECUTION_LEVEL_LIMIT) {
         log.info(execution, 'Sub Execution limit reached')
         return execution
-    }    
+    }
+    
+    if (execution.errorOnLevelMax) {
+        return execution
+    }
 
     
     (execution.extractedContent || [])
