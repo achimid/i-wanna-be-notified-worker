@@ -59,7 +59,7 @@ const setUserAgent = async (vo) => {
         await vo.page.setUserAgent(userAgentRandom)    
         log.info(vo, 'UserAgent added')
     } catch (errorOnAddUserAgent) {
-        log.info(vo, 'Error on add userAgent')        
+        log.info(vo, 'Error on add userAgent', errorOnAddUserAgent)        
         return {...vo, errorOnAddUserAgent}
     }
 
