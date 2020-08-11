@@ -157,7 +157,7 @@ const executeScriptTargetRetry = async (vo) => {
 const executeScriptContent = async (vo) => {
         
     log.info(vo, `Executing scriptContent`)
-    const extractedContent = await Promise.all(vo.scriptContent.map(async (script) => {
+    let extractedContent = await Promise.all(vo.scriptContent.map(async (script) => {
         try {
             const result = await vo.page.evaluate(script)
             return Promise.resolve(result)
@@ -168,8 +168,30 @@ const executeScriptContent = async (vo) => {
     }))
 
     log.info(vo, `ScriptContent executed`, extractedContent)
+
     return {...vo, extractedContent}
     
+}
+
+const postExecuteScriptContent = async (vo) => {
+
+    let { extractedContent } = vo
+
+    try {
+        log.info(vo, `Trying to flat extractedContent`)
+        extractedContent = Array.prototype.concat.apply([], extractedContent)        
+    } catch (error) {
+        log.info(vo, `Error on flat extractedContent, ignored`)
+    }
+
+    if (extractedContent.length > 20) {
+        log.info(vo, `extractedContent max size [20] reached, extractedContent truncated`)
+        extractedContent = extractedContent.slice(0, 20)
+    }    
+
+    log.info(vo, `ScriptContent processed`, extractedContent)
+
+    return {...vo, extractedContent}
 }
 
 const printPage = async (vo) => {
@@ -262,6 +284,7 @@ const execute = async (execution) => {
         vo = await executeScriptTarget(vo)
         vo = await executeScriptTargetRetry(vo)
         vo = await executeScriptContent(vo)
+        vo = await postExecuteScriptContent(vo)
         vo = await printPage(vo)        
         vo = await closePage(vo)
         vo = await postExecute(vo)
