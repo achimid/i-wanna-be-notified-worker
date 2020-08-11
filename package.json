@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
+    "test": "node producer-test.js",
     "prod": "node src/index-cluster.js"
   },
   "repository": {

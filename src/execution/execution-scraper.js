@@ -203,7 +203,7 @@ const printPage = async (vo) => {
     
     try {
         log.info(vo, `Removing printscreen file`)
-        await ImagemUtils.removeImageFileFileSystem(path)   
+        // await ImagemUtils.removeImageFileFileSystem(path)   
         log.info(vo, `Printscreen file removed`)                 
     } catch (errorOnRemovePrintscreen) {
         log.info(vo, `Error on remove printScreen`, errorOnRemovePrintscreen)
