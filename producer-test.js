@@ -25,19 +25,11 @@ const main = async () => {
 
 
     const data = {
-        url: 'https://punchsubs.net/projeto/3461/dokyuu-hentai-hxeros',
-        scriptTarget: "[...new Set([...document.querySelector('.cards-recentes').querySelectorAll('a')].map(v => v.innerText.trim()))].toString()",
+        url: 'https://horriblesubs.info/',
+        scriptTarget: "target = ['a', 'b']",
         scriptContent: [
-            "document.querySelectorAll('.card')[0].getAttribute('data-episodionumero').replace('Episódio', 'Episódio ')",
-            "document.querySelector('.cards-recentes').querySelectorAll('a')[0].href",
-            "document.querySelector('.cards-recentes').querySelectorAll('a')[1].href",
-            "document.querySelector('.cards-recentes').querySelectorAll('a')[2].href",
-            "document.querySelector('.cards-recentes').querySelectorAll('a')[3].href",
-            "document.querySelector('.cards-recentes').querySelectorAll('a')[4].href",
-            "document.querySelector('.cards-recentes').querySelectorAll('a')[5].href",
-            "document.querySelector('.cards-recentes').querySelectorAll('a')[6].href",
-            "document.querySelector('.cards-recentes').querySelectorAll('a')[7].href",
-            
+            "target[0]",
+            "target[1]"
         ],
         level: 1
     }
