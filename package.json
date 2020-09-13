@@ -29,7 +29,7 @@
     "mongoose": "^5.9.25",
     "natural": "^2.1.5",
     "node-cron": "^2.0.3",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "puppeteer": "^5.2.0",
     "puppeteer-extra": "^3.1.12",
     "puppeteer-extra-plugin-adblocker": "^2.11.5",
