@@ -29,7 +29,7 @@ const applyChanged = async (execution) => {
     log.info(execution, 'Calculation changed hash')
 
     const { hashTarget, monitoringId, level } = execution
-    const lastExecution = await Execution.find({monitoringId, level}).sort({_id: -1}).limit(1).lean()
+    const lastExecution = await Execution.many(Model => Model.find({monitoringId, level}).sort({_id: -1}).limit(1).lean())
 
     let hashTargetChanged = lastExecution.length > 0 ? lastExecution[0].hashTarget != hashTarget : false
 
@@ -41,7 +41,7 @@ const applyUnique = async (execution) => {
     log.info(execution, 'Calculation unique hash')
 
     const { hashTarget } = execution
-    const findedExecution = await Execution.findOne({ hashTarget }).lean()
+    const findedExecution = await Execution.findOneLean({ hashTarget })
 
     const hashTargetUnique = !findedExecution
 
@@ -53,7 +53,7 @@ const saveExecution = async (execution) => {
     log.info(execution, 'Save execution')
 
     delete execution._id
-    const newExecution = new Execution(execution)
+    const newExecution = Execution.get(execution)
 
     try {
         await newExecution.save()
