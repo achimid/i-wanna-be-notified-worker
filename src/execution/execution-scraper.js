@@ -248,6 +248,7 @@ const postExecute = async (vo) => {
     const executionTime = (endTime.getTime() - vo.startTime.getTime()) + 'ms'
     log.info(vo, `Execution time: ${executionTime}`)
         
+    vo.extractedTarget = vo.extractedTarget.toString()
     let extractedTargetNormalized = vo.extractedTarget
 
     log.info(vo, `Normalizando responseTarget`)
