@@ -1,4 +1,5 @@
 require('dotenv').config()
+require('appmetrics-dash').attach()
 
 const browserInit = require('./config/puppeteer')
 const healthcheck = require('./config/healthcheck')
