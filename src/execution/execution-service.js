@@ -28,8 +28,10 @@ const applyChangedUnique = async (execution) => Promise.all([
 const applyChanged = async (execution) => {
     log.info(execution, 'Calculation changed hash')
 
-    const { hashTarget, monitoringId, level } = execution
-    const lastExecution = await Execution.many(Model => Model.find({monitoringId, level}).sort({_id: -1}).limit(1).lean())
+    const { hashTarget, monitoringId, level, url } = execution
+    
+    let lastExecution = await Execution.many(Model => Model.find({monitoringId, level, url}).sort({_id: -1}).limit(1).lean())
+    lastExecution = lastExecution.sort((a,b) => a._id.toString() < b._id.toString())
 
     let hashTargetChanged = lastExecution.length > 0 ? lastExecution[0].hashTarget != hashTarget : false
 
