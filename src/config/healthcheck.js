@@ -15,7 +15,7 @@ router.get('/', async (req, res) => { res.json({status: 'ok'}) })
 const restarAppScheduler = () => {
     if (!KEY || !APP) return
 
-    console.log('*************************')
+    console.log('************************* Restarting application')
     fetch(`https://api.heroku.com/apps/${APP}/dynos`, 
         {
             method: 'DELETE',
