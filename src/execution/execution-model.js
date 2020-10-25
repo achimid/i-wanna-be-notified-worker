@@ -35,7 +35,7 @@ const schema = mongoose.Schema({
         printscreen: { type: Boolean },
         printscreenFullPage: { type: Boolean },
         levelMax: { type: Number },
-        proxy: { type: String }        
+        proxy: { type: String }
     },
     filter: {
         threshold: Number,
