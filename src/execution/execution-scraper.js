@@ -122,8 +122,6 @@ const executeScriptTarget = async (vo) => {
         return vo
 
     try {
-
-
         log.info(vo, `Executing scriptTarget`)
         const extractedTarget = await vo.page.evaluate(vo.scriptTarget)
 
@@ -142,19 +140,27 @@ const executeScriptTarget = async (vo) => {
 }
 
 const executeScriptTargetRetry = async (vo) => {
-    if (vo.errorOnExecuteScriptTarget) {
+    if (!vo.errorOnExecuteScriptTarget) return vo
+        
+    try {
         log.info(vo, `Fetching page manually - Starging - Page navigation retry`)
-        await fetch(vo.url)
-            .then(res => res.text())
-            .then((content) => vo.page.setContent(content))
+        const extractedTarget = await fetch(vo.url).then(res => res.text())            
         log.info(vo, `Fetching page manually - Ending - Page navigation retry`)
         
         vo = await optionsPosGoto(vo)
+        delete vo.errorOnExecuteScriptTarget
+
+        return {...vo, extractedTarget}
+    } catch (errorOnExecuteScriptTargetRetry) {
+        log.info(vo, `Error on execute retry ScriptTarget`, errorOnExecuteScriptTargetRetry)
+        return {...vo, errorOnExecuteScriptTargetRetry }
     }
-    return vo
+    
 }
 
 const executeScriptContent = async (vo) => {
+
+    if (vo.scriptContent == undefined || vo.scriptContent.length == 0) return vo
         
     log.info(vo, `Executing scriptContent`)
     let extractedContent = await Promise.all(vo.scriptContent.map(async (script) => {
@@ -248,7 +254,7 @@ const postExecute = async (vo) => {
     const executionTime = (endTime.getTime() - vo.startTime.getTime()) + 'ms'
     log.info(vo, `Execution time: ${executionTime}`)
         
-    vo.extractedTarget = vo.extractedTarget.toString()
+    vo.extractedTarget = vo.extractedTarget ? vo.extractedTarget.toString() : vo.extractedTarget
     let extractedTargetNormalized = vo.extractedTarget
 
     log.info(vo, `Normalizando responseTarget`)
@@ -257,7 +263,7 @@ const postExecute = async (vo) => {
     }
     
     log.info(vo, `Checking possible errors`)
-    const isSuccess = !(vo.errorOnExecuteScriptTarget || vo.errorOnPrintPage || vo.errorOnUploadPrintscreen)
+    const isSuccess = !(vo.errorOnExecuteScriptTarget || vo.errorOnPrintPage || vo.errorOnUploadPrintscreen || vo.errorOnExecuteScriptTargetRetry)
     
     log.info(vo, `Gerando hashTarget`)
     const hashTarget = crypto.createHash('md5').update(JSON.stringify({data: extractedTargetNormalized})).digest("hex")    

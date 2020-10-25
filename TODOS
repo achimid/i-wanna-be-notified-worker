@@ -1,1 +1,3 @@
 - Melhor o README.md
+
+- Adicionar configuração para excluir o a execution, não armazenando nenhum registro, como se fosse uma execução temporária.

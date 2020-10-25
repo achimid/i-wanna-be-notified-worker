@@ -79,7 +79,7 @@ const schema = mongoose.Schema({
     errorOnUploadPrintscreen: { type: Object },
     errorOnRemovePrintscreen: { type: Object },
     errorOnExecuteScriptTarget: { type: Object },
-    errorOnExecuteScriptTarget: { type: Object },
+    errorOnExecuteScriptTargetRetry: { type: Object },
     errorOnAddUserAgent: { type: Object }
 }, { versionKey: false, timestamps: true })
 
