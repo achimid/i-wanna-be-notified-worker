@@ -4,10 +4,16 @@ const postNotifyComplete = (data) => queue.sendToQueue("EXECUTION_COMPLETED", da
 
 const postSubExecution = (data) => queue.sendToQueue("EXECUTION_SEQUENCIAL", data)
 
+const postSubExecutionDLQ = (data) => (error) => queue.sendToQueue("EXECUTION_SEQUENCIAL_DLQ", { data, error })
+
 const postExecution = (data) => queue.sendToQueue("EXECUTION_INCOMING", data)
+
+const postExecutionDLQ = (data) => (error) => queue.sendToQueue("EXECUTION_INCOMING_DLQ", { data, error })
 
 module.exports = {
     postNotifyComplete,
     postSubExecution,
-    postExecution
+    postSubExecutionDLQ,
+    postExecution,
+    postExecutionDLQ
 }

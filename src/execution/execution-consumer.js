@@ -1,18 +1,31 @@
 const queue = require("../utils/queue")
 const service = require('./execution-service')
+const producer = require('./execution-producer')
+
+const prefetchIncoming = parseInt(process.env.CONCURENT_QUEUE_EXECUTIONS)
+const prefetchSequencial = parseInt(process.env.CONCURENT_QUEUE_SUB_EXECUTIONS)
 
 module.exports = async () => {
     console.info('Starging execution consumer')
     
-    queue.consumeFromQueueWithAck("EXECUTION_INCOMING", (message, ack) => {
-        const data = JSON.parse(message.content.toString())
-        service.startExecution(data).then(ack)
-    }, parseInt(process.env.CONCURENT_QUEUE_EXECUTIONS))
+    const toData = (message) => JSON.parse(message.content.toString())
 
+    const onConsumeIncoming = (message, ack) => {
+        const data = toData(message)
+        service.startExecution(data)
+            .catch(producer.postExecutionDLQ(data))
+            .finally(ack)
+    }
 
-    queue.consumeFromQueueWithAck("EXECUTION_SEQUENCIAL", (message, ack) => {
-        const data = JSON.parse(message.content.toString())
-        service.startExecution(data).then(ack)
-    }, parseInt(process.env.CONCURENT_QUEUE_SUB_EXECUTIONS))
+    const onConsumeSequencial = (message, ack) => {
+        const data = toData(message)
+        service.startExecution(data)
+            .catch(producer.postSubExecutionDLQ(data))
+            .finally(ack)
+    }
+
+    queue.consumeFromQueueWithAck("EXECUTION_INCOMING", onConsumeIncoming, prefetchIncoming)
+
+    queue.consumeFromQueueWithAck("EXECUTION_SEQUENCIAL", onConsumeSequencial, prefetchSequencial)
 
 }
