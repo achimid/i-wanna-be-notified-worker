@@ -1,3 +1,4 @@
+const cron = require('node-cron')
 const puppeteer = require('puppeteer-extra')  
 const stealthPlugin = require('puppeteer-extra-plugin-stealth')
 const adblockerPlugin = require('puppeteer-extra-plugin-adblocker')
@@ -27,5 +28,29 @@ const browserInit = async () => {
         
     console.info('Browser inicializado...')
 }
+
+const browserRestart = async () => {
+
+    if (!global.browser) return
+    
+    console.log('Closing all pages...')
+    for (const page of await global.browser.pages()) {
+        if (!await page.isClosed()) {
+            await page.close()        
+        }
+    }
+
+    console.log('Closing browser...')
+    await global.browser.close()
+
+    console.log('Clean browser variable...')
+    global.browser = null
+
+    await browserInit()    
+}
+
+console.info('Iniciando job de restart do puppeteer...')
+cron.schedule(process.env.CRON_TIME_RESTART_PUPPETEER , browserRestart)
+browserRestart().then(() => console.log('teste'))
 
 module.exports = browserInit
