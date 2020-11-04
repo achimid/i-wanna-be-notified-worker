@@ -8,20 +8,20 @@ const main = async () => {
     const { startExecution } = require('./src/execution/execution-service')
 
     // {
-    //     name: document.querySelector('.entry-title').innerText.split(' [Ep.')[0],
-    //     number: 'Episódio ' + document.querySelector('.entry-title').innerText.split(' [Ep.')[1].split(']')[0].trim(),
+    //     name: document.querySelector('.post-title').innerText.split('–')[0],
+    //     number: 'Episódio ' + document.querySelector('.post-title').innerText.split('–')[1],
     //     url: window.location.href
     // }
 
-    // JSON.stringify({name: document.querySelector('.entry-title').innerText.split(' [Ep.')[0], number: 'Episódio ' + document.querySelector('.entry-title').innerText.split(' [Ep.')[1].split(']')[0].trim(), url: window.location.href})
+    // JSON.stringify({name: document.querySelector('.post-title').innerText.split('–')[0], number: 'Episódio ' + document.querySelector('.post-title').innerText.split('–')[1], url: window.location.href})
 
     let data = {
         "scriptContent": [
-            "document.querySelector('.entry-title').innerText",
-            "[...document.querySelectorAll('.entry-title.td-module-title a')].slice(0, 5).map(i => i.href)"
+            "JSON.stringify({name: document.querySelector('.post-title').innerText.split('–')[0], number: 'Episódio ' + document.querySelector('.post-title').innerText.split('–')[1], url: window.location.href})",
+            "[...document.querySelectorAll('.post-title a')].filter(a => a.innerText.indexOf('–') > 0).map(a => a.href)"
         ],
-        "url": "https://hdsubs.org/",
-        "name": "HD Subs",
+        "url": "https://elite.fansubs.com.br/2020/11/02/hinamatsuri-bd-vol1/",
+        "name": "Elite Fansub",
         "regularity": "*/1 * * * *",
         "scriptTarget": "'[none]'",
         "options": {
@@ -31,11 +31,7 @@ const main = async () => {
     }
     // "url": "https://i-wanna-be-notified-catalog.herokuapp.com/api/v1/log",
     
-    // https://www.kyoshirofansub.com/
-    // https://kawaiiotome.com.br/
-    // https://www.tenroufansub.com/
-    // http://absolutesub.fansub.com.br/
-    // https://elite.fansubs.com.br/
+    
     // https://boteco.fansubs.com.br/
     // https://katawaredoki.fansubs.com.br/
     // https://nadjafansub.home.blog/

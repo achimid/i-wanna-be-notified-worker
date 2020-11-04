@@ -86,8 +86,15 @@ const optionsPreGoto = async (vo) => {
 const gotoUrl = async (vo) => {
     log.info(vo, 'Starting access to url')
     const { waitUntil, timeout } = vo.options
-    await vo.page.goto(vo.url, { waitUntil, timeout })
-    log.info(vo, 'Completed access to url', vo.url)
+
+    try {
+        await vo.page.goto(vo.url, { waitUntil, timeout })
+        
+        log.info(vo, 'Completed access to url', vo.url)    
+    } catch (errorOnAccessUrl) {
+        log.info(vo, 'Error on accessUrl', errorOnAccessUrl)        
+        return {...vo, errorOnAccessUrl}
+    }    
 
     return vo
 }

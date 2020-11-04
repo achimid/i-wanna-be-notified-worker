@@ -80,7 +80,8 @@ const schema = mongoose.Schema({
     errorOnRemovePrintscreen: { type: Object },
     errorOnExecuteScriptTarget: { type: Object },
     errorOnExecuteScriptTargetRetry: { type: Object },
-    errorOnAddUserAgent: { type: Object }
+    errorOnAddUserAgent: { type: Object },
+    errorOnAccessUrl: { type: Object }
 }, { versionKey: false, timestamps: true })
 
 module.exports = mongoose.model('executions', schema, config)
