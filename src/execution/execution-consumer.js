@@ -11,17 +11,27 @@ module.exports = async () => {
     const toData = (message) => JSON.parse(message.content.toString())
 
     const onConsumeIncoming = (message, ack) => {
-        const data = toData(message)
-        service.startExecution(data)
-            .catch(producer.postExecutionDLQ(data))
-            .finally(ack)
+        try {
+            const data = toData(message)
+            service.startExecution(data)
+                .catch(producer.postExecutionDLQ(data))
+                .finally(ack)    
+        } catch (error) {
+            console.error(error)
+            ack()
+        }        
     }
 
     const onConsumeSequencial = (message, ack) => {
-        const data = toData(message)
-        service.startExecution(data)
-            .catch(producer.postSubExecutionDLQ(data))
-            .finally(ack)
+        try {
+            const data = toData(message)
+            service.startExecution(data)
+                .catch(producer.postSubExecutionDLQ(data))
+                .finally(ack)    
+        } catch (error) {
+            console.error(error)
+            ack()
+        }        
     }
 
     queue.consumeFromQueueWithAck("EXECUTION_INCOMING", onConsumeIncoming, prefetchIncoming)
