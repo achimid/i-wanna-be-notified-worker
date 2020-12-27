@@ -22,15 +22,16 @@ module.exports = {
                 console.log(uuid, level, log)
             }
         }
-        buffer.push({uuid, executionTime, log, extra, level: vo.level || 0})        
+        // buffer.push({uuid, executionTime, log, extra, level: vo.level || 0})        
+        ExecutionLog.create({uuid, executionTime, log, extra, level: vo.level || 0})
     }
 }
 
-setInterval(() => {
-    if (buffer.length == 0) return
+// setInterval(() => {
+//     if (buffer.length == 0) return
 
-    const insertList = [...buffer]
-    buffer = []
+//     const insertList = [...buffer]
+//     buffer = []
 
-    ExecutionLog.insertMany(insertList).then(() => console.log(`${insertList.length} Logs saved`))
-}, 20000)
+//     ExecutionLog.insertMany(insertList).then(() => console.log(`${insertList.length} Logs saved`))
+// }, 20000)
