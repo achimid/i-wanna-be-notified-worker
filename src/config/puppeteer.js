@@ -49,8 +49,7 @@ const browserRestart = async () => {
     await browserInit()    
 }
 
-console.info('Iniciando job de restart do puppeteer...')
-cron.schedule(process.env.CRON_TIME_RESTART_PUPPETEER , browserRestart)
-browserRestart().then(() => console.log('teste'))
+// console.info('Iniciando job de restart do puppeteer...')
+// cron.schedule(process.env.CRON_TIME_RESTART_PUPPETEER , browserRestart)
 
 module.exports = browserInit

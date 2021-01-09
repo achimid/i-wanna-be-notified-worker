@@ -67,6 +67,8 @@ const model = (collection, schema, config) => {
     const deleteMany = (_doc) => raw(Model => Model.deleteMany(_doc))
 
     const findByIdAndUpdate = (_id, _doc) => one(Model => Model.findByIdAndUpdate(_id, _doc))
+    const updateMany = (_query, _doc) => one(Model => Model.updateMany(_query, _doc))
+    
 
     const findAll = () => many(Model => Model.find())
     const find = (_doc) => many(Model => Model.find(_doc))
@@ -97,7 +99,8 @@ const model = (collection, schema, config) => {
         findAll,
         find,
         findAllLean,
-        findLean
+        findLean,
+        updateMany
     }
 }
 

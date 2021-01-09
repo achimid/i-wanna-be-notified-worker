@@ -2,55 +2,61 @@ require('dotenv').config()
 
 const main = async () => {
     await require('./src/config/puppeteer')()
-    await require('./src/config/database').databaseInit()
 
-    const { execute } = require('./src/execution/execution-scraper')
-    const { startExecution } = require('./src/execution/execution-service')
+    type: 'crawler | scraper'
+    const siteUrl = 'https://www.animestc.net/'
+    const scriptNavigate = "[...document.querySelectorAll('a')].map(e => e.href)"
+    const scriptExtract = "document.querySelector('.series-header-title')?.innerText || '[No Content]'"
 
-    // {
-    //     name: document.querySelector('.post-title').innerText.split('–')[0],
-    //     number: 'Episódio ' + document.querySelector('.post-title').innerText.split('–')[1],
-    //     url: window.location.href
-    // }
+    let toExecute = new Array(siteUrl)
+    const executed = new Set()
+    const extracted = new Array()
+    
+    const page = await global.browser.newPage()  
+    let counter = 0    
 
-    // JSON.stringify({name: document.querySelector('.post-title').innerText.split('–')[0], number: 'Episódio ' + document.querySelector('.post-title').innerText.split('–')[1], url: window.location.href})
+    console.time('executionComplete')
+    
+    // subDominios[3]
+    // qtdePorDominios[500]
+    
+    while (toExecute.length > 0 && counter < 50) {
+        const url = toExecute.shift()
+        if (executed.has(url)) continue
+        
+        console.time('execution')
+        
+        executed.add(url)
+        await page.goto(url)
 
-    let data = {
-        "scriptContent": [
-            "JSON.stringify({name: document.querySelector('.post-title').innerText.split('–')[0], number: 'Episódio ' + document.querySelector('.post-title').innerText.split('–')[1], url: window.location.href})",
-            "[...document.querySelectorAll('.post-title a')].filter(a => a.innerText.indexOf('–') > 0).map(a => a.href)"
-        ],
-        "url": "https://elite.fansubs.com.br/2020/11/02/hinamatsuri-bd-vol1/",
-        "name": "Elite Fansub",
-        "regularity": "*/1 * * * *",
-        "scriptTarget": "'[none]'",
-        "options": {
-            "levelMax": 1,
-            "temporary": true
-        }
+        const allLinks = await page.evaluate(scriptNavigate)
+        const content = await page.evaluate(scriptExtract)
+
+        extracted.push({ url, content })
+        
+        allLinks
+            // .filter(l => l.indexOf(siteUrl) >= 0)
+            .filter(l => !executed.has(l))
+            .map(l => toExecute.push(l))
+
+        console.log(url)
+        console.log(content)
+        console.log(`Encontrados: [${allLinks.length}]`)
+        console.log(`Para Navegar: [${toExecute.length}]`)
+        console.log(`Navegados: [${executed.size}]`)
+        console.timeEnd('execution')
+        // console.log(toExecute)
+        console.log('--------------------')
+
+        toExecute = [...new Set(toExecute)]
+        counter++
     }
-    // "url": "https://i-wanna-be-notified-catalog.herokuapp.com/api/v1/log",
-    
-    
-    // https://boteco.fansubs.com.br/
-    // https://katawaredoki.fansubs.com.br/
-    // https://nadjafansub.home.blog/
-    // https://kallingfansub.wordpress.com/
-    // https://kirinashi.fansubs.com.br/
-    // https://mastercorpsfansubbers.blogspot.com/
-    // https://sakuraanimes.com/
-    // https://animeshouse.net/
-    // https://www.anitube.site/
-    // https://isekaisubs.com/
-    // https://shinmeikai.net/*
 
+    page.close()
 
-    
+    console.timeEnd('executionComplete')
 
-    startExecution(data)
-        .then(console.log)
-        .catch(console.error)
-
+    console.log(extracted)
 
 }
 

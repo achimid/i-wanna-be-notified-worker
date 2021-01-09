@@ -1,16 +1,22 @@
 const log = require('../logger/logger')
 const Execution = require('./execution-model')
-const scraper = require('./execution-scraper')
+const crawler = require('./execution-crawler')
 const producer = require('./execution-producer')
 const commons = require('../utils/commons')
 
-const startExecution = async (data) => {
+const { 
+    processAndSaveExecutionsLink, 
+    updateExecutionLinkAsExecuted, 
+    isLastExecutionInContext } = require('../context/context-service')
 
-    return scraper.execute(data)
+const startExecution = async (data) => {    
+
+    return crawler.execute(data)
         .then(applyFilter)
         .then(applyChangedUnique)
         .then(saveExecution)
         .then(createSubExecution)
+        .then(updateExecution)
         .then(notifyExecution)
 
 }
@@ -67,49 +73,44 @@ const saveExecution = async (execution) => {
     return newExecution.toJSON()
 }
 
-const updateExecutionAsLast = (execution) => {
-    log.info(execution, 'Updating execution')    
-    return Execution.findByIdAndUpdate(execution._id, { isLast: true })
-}
-
-const createSubExecution = async (execution) => {
-    if (execution.level >= process.env.EXECUTION_LEVEL_LIMIT) {
-        log.info(execution, 'Sub Execution limit reached')                
-        
-        const executionUpdated = await updateExecutionAsLast(execution)
-        
-        return executionUpdated
-    }
+// Problema de concorrencia de acesso ao mongo nesta logica
+const updateExecution = async (execution) => {
+    log.info(execution, 'Updating execution')        
     
+    let updated = execution
 
-    if (execution.options.levelMax && execution.level >= execution.options.levelMax) {        
-        log.info(execution, 'Sub Execution limit reached')
+    const isLast = await isLastExecutionInContext(execution)
+    if (isLast && execution.linksExtractedToNavigate.length <= 0) {
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         
-        const executionUpdated = await updateExecutionAsLast(execution)
-        
-        return executionUpdated
+        updated.isLast = true
+        await Execution.findByIdAndUpdate(execution._id, { isLast: true })
     }
 
-    const linksFromExtractedContent = getLinksFromExtractedContent(execution)
-
-    if (!linksFromExtractedContent || linksFromExtractedContent.length == 0) {
-        
-        const executionUpdated = await updateExecutionAsLast(execution)
-        
-        return executionUpdated
-    } else {
-        linksFromExtractedContent
-            .map(mapNewSubExecution(execution))
-            .map(postSubExecution)
-    }
+    await updateExecutionLinkAsExecuted(execution)
 
     return execution
 }
 
-const getLinksFromExtractedContent = (execution) => {
-    return (execution.extractedContent || [])
-        .filter(v => v)
-        .filter(commons.isURL)
+const createSubExecution = async (execution) => {
+    if (execution.level >= process.env.EXECUTION_LEVEL_LIMIT) {
+        log.info(execution, 'Sub Execution limit reached')                        
+        return execution
+    }
+    
+
+    if (execution.options.levelMax != undefined && execution.level >= execution.options.levelMax) {        
+        log.info(execution, 'Sub Execution limit reached')
+        return execution
+    }
+
+    const linksExtractedToNavigate = await processAndSaveExecutionsLink(execution)
+    
+    linksExtractedToNavigate
+        .map(mapNewSubExecution(execution))
+        .map(postSubExecution)   
+
+    return {...execution, linksExtractedToNavigate}
 }
 
 const postSubExecution = (execution) => {
