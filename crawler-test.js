@@ -16,8 +16,8 @@ const main = async () => {
         "scriptTarget": "'[None]'"
     }
 
-    execute(data)
-        .then(console.log)
+    startExecution(data)
+        .then(() => {})
         .catch(console.error)
 
 

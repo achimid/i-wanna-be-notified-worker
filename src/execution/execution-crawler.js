@@ -205,7 +205,7 @@ const executeScriptNavigate = async (vo) => {
         const extractedValue = await vo.page.evaluate(vo.scriptNavigate)
         const extractedNavigate = prepareExtractedNavigate(vo, extractedValue)
         
-        log.info(vo, `ScriptNavigate processed`, extractedNavigate)
+        log.info(vo, `ScriptNavigate processed`)
 
         return {...vo, extractedNavigate }
     } catch (errorOnExecuteScriptNavigate) {
@@ -333,24 +333,24 @@ const postExecute = async (vo) => {
 }
 
 
-const execute = async (exec) => {
+const execute = async (exec, callback) => {
     
     let vo = await createExecutionVO(exec)
 
     try {
         
         const strategy = (exec.mode == 'crawler' ? executeCrawler: executeScraper)
-        vo = await strategy(vo)
+        vo = await strategy(callback)(vo)
         
     } catch (unespectedError) {
         log.info(vo, 'UnespectedError: ', unespectedError)
         return {...vo, unespectedError}
     }
-
+    
     return vo
 }
 
-const executeScraper = async (exec) => {
+const executeScraper = (serviceContinueCallback) => async (exec) => {
 
     let vo = await createExecutionVO(exec)
         vo = await preValidate(vo)
@@ -369,10 +369,12 @@ const executeScraper = async (exec) => {
         vo = await closePage(vo)
         vo = await postExecute(vo)
 
-    return vo
+    serviceContinueCallback(vo)
+
+    return [vo]
 }
 
-const executeCrawler = async (exec) => {
+const executeCrawler = (serviceContinueCallback) => async (exec) => {
 
     let counter = 0
     let urlToExecute = new Array(exec.url)
@@ -382,7 +384,9 @@ const executeCrawler = async (exec) => {
     const { page } = await createNewPage(exec)
     let vo = exec
 
-    while (urlToExecute.length > 0 && counter < 200) {
+    const reachLimit = (value) => value >= (exec.options.levelMax || 2)
+
+    while (urlToExecute.length > 0 && !reachLimit(counter)) {
         
         const url = urlToExecute.shift()
         if (urlExecuted.has(url)) {
@@ -423,6 +427,12 @@ const executeCrawler = async (exec) => {
         urlToExecute = [...new Set(urlToExecute)]
         counter++
 
+        if (urlToExecute.length == 0 || reachLimit(counter)) {
+            vo.isLast = true
+        }
+
+        serviceContinueCallback(vo)
+
         console.log(url)
         console.log(`Encontrados: [${urlExtracted.length}]`)
         console.log(`Para Navegar: [${urlToExecute.length}]`)
@@ -430,7 +440,7 @@ const executeCrawler = async (exec) => {
         console.log('--------------------')        
     }
 
-    await closePage({ page })
+    await closePage({...vo, page})
 
     return executions
 

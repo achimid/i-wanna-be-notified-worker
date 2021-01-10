@@ -7,13 +7,14 @@ const commons = require('../utils/commons')
 
 const startExecution = async (data) => {
 
-    return crawler.execute(data)
+    const callback = async (vo) => Promise.resolve(vo)
         .then(applyFilter)
         .then(applyChangedUnique)
         .then(saveExecution)
         .then(createSubExecution)
         .then(notifyExecution)
 
+    return crawler.execute(data, callback) 
 }
 
 const applyChangedUnique = async (execution) => Promise.all([
@@ -68,36 +69,22 @@ const saveExecution = async (execution) => {
     return newExecution.toJSON()
 }
 
-const updateExecutionAsLast = (execution) => {
-    log.info(execution, 'Updating execution')    
-    return Execution.findByIdAndUpdate(execution._id, { isLast: true })
-}
-
 const createSubExecution = async (execution) => {
     if (execution.level >= process.env.EXECUTION_LEVEL_LIMIT) {
-        log.info(execution, 'Sub Execution limit reached')                
-        
-        const executionUpdated = await updateExecutionAsLast(execution)
-        
-        return executionUpdated
+        log.info(execution, 'Sub Execution limit reached')        
+        return execution
     }
     
 
     if (execution.options.levelMax && execution.level >= execution.options.levelMax) {        
         log.info(execution, 'Sub Execution limit reached')
-        
-        const executionUpdated = await updateExecutionAsLast(execution)
-        
-        return executionUpdated
+        return execution
     }
 
     const linksFromExtractedContent = getLinksFromExtractedContent(execution)
 
     if (!linksFromExtractedContent || linksFromExtractedContent.length == 0) {
-        
-        const executionUpdated = await updateExecutionAsLast(execution)
-        
-        return executionUpdated
+        return execution
     } else {
         linksFromExtractedContent
             .map(mapNewSubExecution(execution))
