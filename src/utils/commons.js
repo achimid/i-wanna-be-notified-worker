@@ -41,10 +41,13 @@ const isTrue = (v) => v == 'true' || v == true
 
 const isFalse = (v) => v == 'false' || v == false || v == '' || v == undefined || v == null
 
+const getDomainOrigin = (v) => new URL(v).origin
+
 module.exports = {
     isTrue,
     isFalse,
     isURL,
+    getDomainOrigin,
     findSimilarity,
     hasSimilarity
 }

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node test-restar.js",
+    "test": "node crawler-test.js",
     "prod": "node src/index-cluster.js"
   },
   "repository": {

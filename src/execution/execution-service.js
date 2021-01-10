@@ -1,12 +1,13 @@
 const log = require('../logger/logger')
 const Execution = require('./execution-model')
-const scraper = require('./execution-scraper')
+// const scraper = require('./execution-scraper')
+const crawler = require('./execution-crawler')
 const producer = require('./execution-producer')
 const commons = require('../utils/commons')
 
 const startExecution = async (data) => {
 
-    return scraper.execute(data)
+    return crawler.execute(data)
         .then(applyFilter)
         .then(applyChangedUnique)
         .then(saveExecution)

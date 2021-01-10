@@ -29,28 +29,28 @@ const browserInit = async () => {
     console.info('Browser inicializado...')
 }
 
-const browserRestart = async () => {
+// const browserRestart = async () => {
 
-    if (!global.browser) return
+//     if (!global.browser) return
     
-    console.log('Closing all pages...')
-    for (const page of await global.browser.pages()) {
-        if (!await page.isClosed()) {
-            await page.close()        
-        }
-    }
+//     console.log('Closing all pages...')
+//     for (const page of await global.browser.pages()) {
+//         if (!await page.isClosed()) {
+//             await page.close()        
+//         }
+//     }
 
-    console.log('Closing browser...')
-    await global.browser.close()
+//     console.log('Closing browser...')
+//     await global.browser.close()
 
-    console.log('Clean browser variable...')
-    global.browser = null
+//     console.log('Clean browser variable...')
+//     global.browser = null
 
-    await browserInit()    
-}
+//     await browserInit()    
+// }
 
-console.info('Iniciando job de restart do puppeteer...')
-cron.schedule(process.env.CRON_TIME_RESTART_PUPPETEER , browserRestart)
-browserRestart().then(() => console.log('teste'))
+// console.info('Iniciando job de restart do puppeteer...')
+// cron.schedule(process.env.CRON_TIME_RESTART_PUPPETEER , browserRestart)
+// browserRestart().then(() => console.log('teste'))
 
 module.exports = browserInit
