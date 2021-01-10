@@ -1,9 +1,8 @@
-# i-wanna-be-notified-worker
+# [IWannaBeNotified](http://iwannabenotified.ddns.net/) 
 
-Aplicação responsavel pelas execuções e extrações de conteudo.
+Para mais informações leia a documentação deste projeto: [README.md](https://github.com/achimid/i-wanna-be-notified-api)
 
-
-# Como contribuir com o projeto?
+## Como contribuir com o projeto?
 * Você pode enviar sugestões e ideias.
 * Você pode abrir um PR com alterações.
 * Você pode falar do projeto para um amigo.
@@ -15,3 +14,16 @@ Aplicação responsavel pelas execuções e extrações de conteudo.
       <img src="https://www.paypalobjects.com/pt_BR/i/btn/btn_donateCC_LG.gif" alt="Botão de Doação">
   </a>
 </p>
+
+
+## Arquitetura
+
+Este projeto é dividido em diversos micro-serviço, acesse outros repositório do projeto:
+
+* [i-wanna-be-notified-api](https://github.com/achimid/i-wanna-be-notified-api)
+* [i-wanna-be-notified-front](https://github.com/achimid/i-wanna-be-notified-front)
+* [i-wanna-be-notified-worker](https://github.com/achimid/i-wanna-be-notified-worker)
+* [i-wanna-be-notified-scheduler](https://github.com/achimid/i-wanna-be-notified-scheduler)
+* [i-wanna-be-notified-notify](https://github.com/achimid/i-wanna-be-notified-notify)
+* [i-wanna-be-notified-catalog](https://github.com/achimid/i-wanna-be-notified-catalog)
+* [i-wanna-be-notified-scripts](https://github.com/achimid/i-wanna-be-notified-scripts)
