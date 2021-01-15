@@ -1,19 +1,16 @@
 const queue = require("../utils/queue")
 
-const postNotifyComplete = (data) => queue.sendToQueue("EXECUTION_COMPLETED", data)
+const postIncoming = (data) => queue.sendToQueue("INCOMING", data)
 
-const postSubExecution = (data) => queue.sendToQueue("EXECUTION_SEQUENCIAL", data)
+const postExecution = (data) => queue.sendToQueue("EXECUTION", data)
 
-const postSubExecutionDLQ = (data) => (error) => queue.sendToQueue("EXECUTION_SEQUENCIAL_DLQ", { data, error })
+const postExecutionCompleted = (data) => queue.sendToQueue("EXECUTION_COMPLETED", data)
 
-const postExecution = (data) => queue.sendToQueue("EXECUTION_INCOMING", data)
-
-const postExecutionDLQ = (data) => (error) => queue.sendToQueue("EXECUTION_INCOMING_DLQ", { data, error })
+const postExecutionResponse = (data) => queue.sendToQueue(`EXECUTION_RESPONSE_${data.uuid}`, data)
 
 module.exports = {
-    postNotifyComplete,
-    postSubExecution,
-    postSubExecutionDLQ,
+    postIncoming,
     postExecution,
-    postExecutionDLQ
+    postExecutionResponse,
+    postExecutionCompleted
 }

@@ -333,26 +333,12 @@ const postExecute = async (vo) => {
 }
 
 
-const execute = async (exec, callback) => {
+const execute = async (exec) => {
     
     let vo = await createExecutionVO(exec)
 
     try {
         
-        const strategy = (exec.mode == 'crawler' ? executeCrawler: executeScraper)
-        vo = await strategy(callback)(vo)
-        
-    } catch (unespectedError) {
-        log.info(vo, 'UnespectedError: ', unespectedError)
-        return {...vo, unespectedError}
-    }
-    
-    return vo
-}
-
-const executeScraper = (serviceContinueCallback) => async (exec) => {
-
-    let vo = await createExecutionVO(exec)
         vo = await preValidate(vo)
         vo = await createNewPage(vo)
         vo = await setUserAgent(vo)
@@ -363,87 +349,19 @@ const executeScraper = (serviceContinueCallback) => async (exec) => {
         vo = await executeScriptTarget(vo)
         vo = await executeScriptTargetRetry(vo)
         vo = await executeScriptContent(vo)
+        vo = await executeScriptNavigate(vo)
         vo = await postExecuteScriptContent(vo)
         vo = await printPage(vo)        
         
         vo = await closePage(vo)
         vo = await postExecute(vo)
-
-    serviceContinueCallback(vo)
-
-    return [vo]
-}
-
-const executeCrawler = (serviceContinueCallback) => async (exec) => {
-
-    let counter = 0
-    let urlToExecute = new Array(exec.url)
-    const executions = new Array()
-    const urlExecuted = new Set()
-    
-    const { page } = await createNewPage(exec)
-    let vo = exec
-
-    const reachLimit = (value) => value >= (exec.options.levelMax || 2)
-
-    while (urlToExecute.length > 0 && !reachLimit(counter)) {
         
-        const url = urlToExecute.shift()
-        if (urlExecuted.has(url)) {
-            log.info(vo, `Ignoring url repeated [${url}] `)
-            continue
-        }
-
-        try {
-        
-            vo = await createExecutionVO({...exec, url, page, level: counter})
-            vo = await preValidate(vo)
-            vo = await createNewPage(vo)
-            vo = await setUserAgent(vo)
-            vo = await optionsPreGoto(vo)
-
-            vo = await gotoUrl(vo)
-            vo = await optionsPosGoto(vo)
-            vo = await executeScriptTarget(vo)
-            vo = await executeScriptTargetRetry(vo)
-            vo = await executeScriptContent(vo)                
-            vo = await executeScriptNavigate(vo)
-            vo = await printPage(vo)        
-
-            vo = await postExecute(vo)
-        
-        } catch (unespectedError) {
-            log.info(vo, 'UnespectedError: ', unespectedError)
-            vo = {...vo, unespectedError}
-        }
-        
-        delete vo.page
-        const urlExtracted = vo.extractedNavigate
-        
-        executions.push(vo)
-        urlExecuted.add(url)
-        urlExtracted.map(v => urlToExecute.push(v))
-        
-        urlToExecute = [...new Set(urlToExecute)]
-        counter++
-
-        if (urlToExecute.length == 0 || reachLimit(counter)) {
-            vo.isLast = true
-        }
-
-        serviceContinueCallback(vo)
-
-        console.log(url)
-        console.log(`Encontrados: [${urlExtracted.length}]`)
-        console.log(`Para Navegar: [${urlToExecute.length}]`)
-        console.log(`Navegados: [${urlExecuted.size}]`)
-        console.log('--------------------')        
+    } catch (unespectedError) {
+        log.info(vo, 'UnespectedError: ', unespectedError)
+        return {...vo, unespectedError}
     }
-
-    await closePage({...vo, page})
-
-    return executions
-
+    
+    return vo
 }
 
 module.exports = {
