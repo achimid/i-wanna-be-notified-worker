@@ -33,7 +33,7 @@ const executionContextManager = (execution) => {
 
     const ctx = {
         counter: 0,
-        urlToExecute: new Array(...execution.extractedNavigate),
+        urlToExecute: new Array(...(execution.extractedNavigate || [])),
         urlExecuted: new Set(),
         urlExecuting: new Set()
     }
