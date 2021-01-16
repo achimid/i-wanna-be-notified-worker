@@ -5,9 +5,9 @@ const fetch = require('node-fetch')
 const ImagemUtils = require('../utils/imagem-util')
 const RandomHttpUserAgent = require('random-http-useragent')
 const useProxy = require('puppeteer-page-proxy')
-const {isTrue, isFalse} = require('../utils/commons')
+const {isTrue, isFalse, isURL, getDomainOrigin} = require('../utils/commons')
 
-const createVO = async (exec) => {
+const createExecutionVO = async (exec) => {
     const uuid = exec.uuid ? exec.uuid : v4()
     const startTime = new Date()
     
@@ -17,9 +17,16 @@ const createVO = async (exec) => {
     log.info(exec , 'Starting extraction')
 
     if (!exec.scriptTarget) exec.scriptTarget = process.env.DEFAULT_JS_SCRIPT_TARGET
+    if (!exec.scriptNavigate && exec.mode == 'crawler') exec.scriptNavigate = process.env.DEFAULT_JS_SCRIPT_NAVIGATE
+
     if (!exec.level) exec.level = 0
     
+
     if (!exec.options) exec.options = {}
+
+    if (!exec.options.filterDomain) exec.options.filterDomain = true
+    if (!exec.options.enableUserAgentRandom) exec.options.enableUserAgentRandom = true
+
     if (!exec.options.timeout) exec.options.timeout = process.env.DEFAULT_OPTIONS_TIMEOUT
     if (!exec.options.waitUntil) exec.options.waitUntil = process.env.DEFAULT_OPTIONS_WAIT_UNTIL
     if (!exec.options.printscreen) exec.options.printscreen = process.env.DEFAULT_OPTIONS_PRINTSCREEN
@@ -35,13 +42,17 @@ const preValidate = async (vo) => {
 }
 
 
-
 const createNewPage = async (vo) => {
-    log.info(vo, 'Creating new page')
-    const page = await global.browser.newPage()
-    log.info(vo, 'New page created')
 
-    return {...vo, page}
+    if (!vo.page) {
+        log.info(vo, 'Creating new page')
+        vo.page = await global.browser.newPage()
+        log.info(vo, 'New page created')
+    } else {
+        log.info(vo, 'Reusing page')
+    }
+
+    return vo
 }
 
 const setUserAgent = async (vo) => {
@@ -165,6 +176,45 @@ const executeScriptTargetRetry = async (vo) => {
     
 }
 
+const prepareExtractedNavigate = (vo, extractedNavigate) => {
+    if (typeof extractedNavigate === 'string') {
+        if (extractedNavigate.indexOf(',') >= 0){
+            extractedNavigate = extractedNavigate.split(',')
+        } else if (extractedNavigate.indexOf(';') >= 0) {
+            extractedNavigate = extractedNavigate.split(';')
+        } else {
+            extractedNavigate = [extractedNavigate]
+        }            
+    } else if (!Array.isArray(extractedNavigate)) {
+        extractedNavigate = []
+    }
+
+    extractedNavigate = Array.from(new Set(extractedNavigate))
+
+    return extractedNavigate
+        .filter(isURL)
+        .filter(l => vo.options.filterDomain ? l.indexOf(getDomainOrigin(vo.url)) >= 0 : true)
+}
+
+const executeScriptNavigate = async (vo) => {
+
+    if (!vo.scriptNavigate) return vo        
+    log.info(vo, `Executing scriptNavigate`)    
+
+    try {
+        const extractedValue = await vo.page.evaluate(vo.scriptNavigate)
+        const extractedNavigate = prepareExtractedNavigate(vo, extractedValue)
+        
+        log.info(vo, `ScriptNavigate processed`)
+
+        return {...vo, extractedNavigate }
+    } catch (errorOnExecuteScriptNavigate) {
+        log.info(vo, `Erro on execute scriptNavigate`, errorOnExecuteScriptNavigate)
+        return {...vo, errorOnExecuteScriptNavigate }
+    }
+
+}
+
 const executeScriptContent = async (vo) => {
 
     if (vo.scriptContent == undefined || vo.scriptContent.length == 0) return vo
@@ -279,27 +329,30 @@ const postExecute = async (vo) => {
 
     log.info(vo, `End of execution`)
 
-    return {...vo, endTime, executionTime, extractedTargetNormalized, isSuccess, hashTarget}
+    return {...vo, endTime, executionTime, isSuccess, hashTarget}
 }
 
-const execute = async (execution) => {
+
+const execute = async (exec) => {
     
-    let vo = await createVO(execution)
-    
-    
+    let vo = await createExecutionVO(exec)
+
     try {
         
         vo = await preValidate(vo)
         vo = await createNewPage(vo)
         vo = await setUserAgent(vo)
         vo = await optionsPreGoto(vo)
+
         vo = await gotoUrl(vo)
         vo = await optionsPosGoto(vo)
         vo = await executeScriptTarget(vo)
         vo = await executeScriptTargetRetry(vo)
         vo = await executeScriptContent(vo)
+        vo = await executeScriptNavigate(vo)
         vo = await postExecuteScriptContent(vo)
         vo = await printPage(vo)        
+        
         vo = await closePage(vo)
         vo = await postExecute(vo)
         
@@ -307,7 +360,7 @@ const execute = async (execution) => {
         log.info(vo, 'UnespectedError: ', unespectedError)
         return {...vo, unespectedError}
     }
-
+    
     return vo
 }
 

@@ -3,14 +3,14 @@ require('appmetrics-dash').attach()
 
 const browserInit = require('./config/puppeteer')
 const healthcheck = require('./config/healthcheck')
-const consumerInit = require('./execution/execution-consumer')
+const { initConsumer } = require('./execution/execution-consumer')
 
 const cors = require('cors')
 const express = require('express')
 const app = express()
 
 browserInit()
-    .then(consumerInit)
+    .then(initConsumer)
 
 app.use(cors())
 app.use(express.json())
