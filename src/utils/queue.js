@@ -2,6 +2,9 @@ const fetch = require('node-fetch')
 
 let conn = null
 
+const authRabbitMQ = Buffer.from(process.env.RABBITMQ_CONNECTION_USER + ':' + process.env.RABBITMQ_CONNECTION_PASSWORD).toString('base64')
+const urlRabbotMQ = process.env.RABBITMQ_CONNECTION_API
+
 function createConnection() {
 	return require('amqplib').connect(process.env.RABBITMQ_CONNECTION).then(conn => conn.createChannel())
 }
@@ -41,8 +44,9 @@ let last
 const manuallyDeleteQueue = (queue) => {
 	if (last) clearTimeout(last)
 	last = setTimeout(()=> {
-		fetch(`${process.env.RABBITMQ_CONNECTION_API}/api/queues/%2F/${queue}`, { 
+		fetch(`${urlRabbotMQ}/api/queues/%2F/${queue}`, { 
 			method: 'DELETE',
+			headers: { 'Authorization': 'Basic ' + authRabbitMQ },
 			body: JSON.stringify({
 				vhost: "%2F",
 				name: queue,
