@@ -24,7 +24,6 @@ const executionContextManager = (execution) => {
     const ctx = {
         counter: 0,
         urlToExecute: new Array(...execution.extractedNavigate),
-        executions: new Array(),
         urlExecuted: new Set(),
         urlExecuting: new Set()
     }
@@ -33,9 +32,8 @@ const executionContextManager = (execution) => {
         log.info(vo, `Execution completed and received with success [${vo.url}]`)
         
         const urlExtracted = vo.extractedNavigate
-        const url = vo.url
+        const url = vo.url        
         
-        ctx.executions.push(vo)
         ctx.urlExecuted.add(url)
         ctx.urlExecuting.delete(url)
         urlExtracted.map(v => ctx.urlToExecute.push(v))
