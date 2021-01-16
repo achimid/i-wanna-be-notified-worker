@@ -22,8 +22,9 @@ const startExecution = async (execution) => {
         .then(notifyExecutionResponse)
 }
 
-const getCache = async ({ url }) => {
-    const dataMatch = { url, isSuccess: true, createdAt: { $lt: new Date(Date.now() - 10 * 60 * 1000) } } // 10 Minutes
+const getCache = async ({ url, scriptTarget, scriptNavigate }) => {
+    const dataMatch = { url, scriptTarget, scriptNavigate, isSuccess: true, 
+        createdAt: { $lt: new Date(Date.now() - 10 * 60 * 1000) } } // 10 Minutes
     const cache = await Execution.findOneLean(dataMatch)
     return cache
 }
