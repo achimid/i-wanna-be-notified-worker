@@ -11,12 +11,21 @@ const consumeIncoming = (data) => startExecution(data).then(executionContextMana
 const consumeExecution = (data) => startExecution(data)
 
 const startExecution = async (execution) => {
+    const cache = await getCache(execution)
+    if (cache) return cache
+
     return crawler.execute(execution)
         .then(applyFilter)
         .then(applyChangedUnique)
         .then(saveExecution)
         .then(notifyExecutionCompleted)
         .then(notifyExecutionResponse)
+}
+
+const getCache = async ({ url }) => {
+    const dataMatch = { url, isSuccess: true, createdAt: { $lt: new Date(Date.now() - 10 * 60 * 1000) } } // 10 Minutes
+    const cache = await Execution.findOneLean(dataMatch)
+    return cache
 }
 
 const executionContextManager = (execution) => {
