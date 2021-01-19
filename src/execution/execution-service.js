@@ -5,16 +5,14 @@ const producer = require('./execution-producer')
 const commons = require('../utils/commons')
 
 const { onExecutionResponse } = require('./execution-consumer-dynamic')
+const { removeQueueByExecution } = require('../utils/queue')
 
 const consumeIncoming = (data) => startExecution(data).then(executionContextManager)
 
 const consumeExecution = (data) => startExecution(data)
 
 const startExecution = async (execution) => {
-    const cache = await getCache(execution)
-    if (cache) return cache
-
-    return crawler.execute(execution)
+    return execute(execution)
         .then(applyFilter)
         .then(applyChangedUnique)
         .then(saveExecution)
@@ -22,10 +20,30 @@ const startExecution = async (execution) => {
         .then(notifyExecutionResponse)
 }
 
-const getCache = async ({ url, scriptTarget, scriptNavigate }) => {
+const execute = async (execution) => {
+    let vo = await getCache(execution)
+    return vo || await crawler.execute(execution)
+}
+
+const getCache = async ({ url, scriptTarget, scriptNavigate, level, uuid }) => {
+    if (!uuid) return null
+    
     const dataMatch = { url, scriptTarget, scriptNavigate, isSuccess: true, 
-        createdAt: { $lt: new Date(Date.now() - 10 * 60 * 1000) } } // 10 Minutes
-    const cache = await Execution.findOneLean(dataMatch)
+        createdAt: { $gt: new Date(Date.now() - 5 * 60 * 1000) } } // 5 Minutes
+    
+    const vo = {uuid, level, startTime: new Date()}
+
+    log.info(vo, 'Start searching for cache')                    
+    let cache = await Execution.findOneLean(dataMatch)
+    log.info(vo, 'End searching for cache')                    
+
+    if (cache) {
+        cache = {...cache, ...vo}
+        delete cache._id
+        cache.endTime = new Date()
+        cache.executionTime = (cache.endTime.getTime() - cache.startTime.getTime()) + 'ms'
+        log.info(cache, 'Cache found, using cached execution')            
+    }
     return cache
 }
 
@@ -50,13 +68,13 @@ const executionContextManager = (execution) => {
         
         ctx.urlToExecute = [...new Set(ctx.urlToExecute)]
 
-        console.log(`Extracted: [${urlExtracted.length}]`)
-        console.log(`To Execute: [${ctx.urlToExecute.length}]`)
-        console.log(`Executiong: [${ctx.urlExecuting.size}]`)
-        console.log(`Executed: [${ctx.urlExecuted.size}]`)
-        console.log('------------------------')  
+        // console.log(`Extracted: [${urlExtracted.length}]`)
+        // console.log(`To Execute: [${ctx.urlToExecute.length}]`)
+        // console.log(`Executiong: [${ctx.urlExecuting.size}]`)
+        // console.log(`Executed: [${ctx.urlExecuted.size}]`)
+        // console.log('------------------------')  
 
-        processExecutionList(ctx, execution)
+        processExecutionList(ctx, vo)
     })
    
     processExecutionList(ctx, execution)    
@@ -66,6 +84,12 @@ const processExecutionList = (ctx, execution) => {
     log.info(execution, `Starting process check`)
 
     const reachLimit = (value) => value >= (execution.options.levelMax || 5)
+    
+    // if (execution.isLast) removeQueueByExecution(execution)
+    if (reachLimit(ctx.counter)) {
+        log.info(execution, `Limit of executions was reached`)
+        return
+    }
 
     while (ctx.urlToExecute.length > 0 && !reachLimit(ctx.counter)) {
         const url = ctx.urlToExecute.shift()
@@ -85,7 +109,24 @@ const processExecutionList = (ctx, execution) => {
         log.info(execution, `Sending execution to parallel process [${url}] `)
         producer.postExecution(data)        
     }
+
+    if (ctx.urlExecuting.size <= 0 && ctx.urlToExecute.length <= 0 && ctx.urlToExecute.length <= 0) {
+        log.info(execution, `End of executions`)
+        
+        updateExecutionAsLast(execution)
+            .then(notifyExecutionCompleted)
+            .then(removeQueueByExecution)
+        // removeQueueByExecution(execution)
+        // notifyExecutionCompleted({...execution, isLast: true})
+    }
 }
+
+const updateExecutionAsLast = (execution) => Execution.findByIdAndUpdate(execution._id, { isLast: true })
+    .then((data) => {
+        log.info(execution, `Update execution as last`)
+        return data.toJSON()
+    })
+    .catch(() => log.info(execution, `Error on change execution as last`))
 
 
 const applyChangedUnique = async (execution) => Promise.all([
@@ -139,51 +180,6 @@ const saveExecution = async (execution) => {
 
     return newExecution.toJSON()
 }
-
-const createSubExecution = async (execution) => {
-    if (execution.level >= process.env.EXECUTION_LEVEL_LIMIT) {
-        log.info(execution, 'Sub Execution limit reached')        
-        return execution
-    }
-    
-
-    if (execution.options.levelMax && execution.level >= execution.options.levelMax) {        
-        log.info(execution, 'Sub Execution limit reached')
-        return execution
-    }
-
-    const linksFromExtractedContent = getLinksFromExtractedContent(execution)
-
-    if (!linksFromExtractedContent || linksFromExtractedContent.length == 0) {
-        return execution
-    } else {
-        linksFromExtractedContent
-            .map(mapNewSubExecution(execution))
-            .map(postSubExecution)
-    }
-
-    return execution
-}
-
-const getLinksFromExtractedContent = (execution) => {
-    return (execution.extractedContent || [])
-        .filter(v => v)
-        .filter(commons.isURL)
-}
-
-const postSubExecution = (execution) => {
-    log.info(execution, 'Creating new subExecution')
-    producer.postSubExecution(execution)
-}
-
-const mapNewSubExecution = (execution) => (content) => {
-    return {
-        ...execution,
-        url: content,
-        level: execution.level + 1        
-    }
-}
-
 
 const notifyExecutionResponse = async (execution) => {
     producer.postExecutionResponse(execution)

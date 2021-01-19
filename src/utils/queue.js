@@ -1,4 +1,5 @@
 const fetch = require('node-fetch')
+const { remove } = require('../logger/log-model')
 
 let conn = null
 
@@ -40,11 +41,17 @@ const sendToQueue = (queue, message) =>
 		.then(channel => channel.sendToQueue(queue, Buffer.from(JSON.stringify(message))))
 
 
-let last
+let queuePool = {}
 const manuallyDeleteQueue = (queue) => {
-	if (last) clearTimeout(last)
-	last = setTimeout(()=> {
-		fetch(`${urlRabbotMQ}/api/queues/%2F/${queue}`, { 
+	if (queuePool[queue]) clearTimeout(queuePool[queue])
+	queuePool[queue] = setTimeout(() => {
+		removeQueue(queue)
+		delete queuePool[queue]
+	}, 60 * 100 * 1) // 1 Minute	
+}
+
+const removeQueue = (queue) => {
+	fetch(`${urlRabbotMQ}/api/queues/%2F/${queue}`, { 
 			method: 'DELETE',
 			headers: { 'Authorization': 'Basic ' + authRabbitMQ },
 			body: JSON.stringify({
@@ -52,16 +59,12 @@ const manuallyDeleteQueue = (queue) => {
 				name: queue,
 				mode: "DELETE"
 			})
-		}).then(() => console.log(`Queue Removed [${queue}]`))
-	}, 60 * 100 * 1) // 1 Minute
+		})
+		.then(() => console.log(`Queue removed [${queue}]`))
+		.catch(() => console.log(`Queue not removed [${queue}]`))
 }
 
-// const consumeFromQueue = (queue, callback) => {
-// 	connect()
-// 		.then(channel => createQueue(channel, queue))
-// 		.then(channel => channel.consume(queue, callback, { noAck: true }))
-// 		.catch(err => console.log(err))
-// }
+const removeQueueByExecution = ({ uuid }) => removeQueue(`EXECUTION_RESPONSE_${uuid}`)
 
 const consumeFromQueueWithAck = (queue, callback, prefetch) => {
 	connect()
@@ -128,5 +131,6 @@ const consumeFromQueue = (queueName, callbackPromise, prefetch, autoDelete) => {
 
 module.exports = {
 	sendToQueue,
-	consumeFromQueue
+	consumeFromQueue,
+	removeQueueByExecution
 }
