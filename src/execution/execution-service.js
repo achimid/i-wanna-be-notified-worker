@@ -12,7 +12,7 @@ const consumeIncoming = (data) => startExecution(data).then(executionContextMana
 const consumeExecution = (data) => startExecution(data)
 
 const startExecution = async (execution) => {
-    return execute(execution)
+    return crawler.execute(execution)
         .then(applyFilter)
         .then(applyChangedUnique)
         .then(saveExecution)
@@ -20,32 +20,32 @@ const startExecution = async (execution) => {
         .then(notifyExecutionResponse)
 }
 
-const execute = async (execution) => {
-    let vo = await getCache(execution)
-    return vo || await crawler.execute(execution)
-}
+// const execute = async (execution) => {
+//     let vo = await getCache(execution)
+//     return vo || await crawler.execute(execution)
+// }
 
-const getCache = async ({ url, scriptTarget, scriptNavigate, level, uuid }) => {
-    if (!uuid) return null
+// const getCache = async ({ url, scriptTarget, scriptNavigate, level, uuid }) => {
+//     if (!uuid) return null
     
-    const dataMatch = { url, scriptTarget, scriptNavigate, isSuccess: true, 
-        createdAt: { $gt: new Date(Date.now() - 5 * 60 * 1000) } } // 5 Minutes
+//     const dataMatch = { url, scriptTarget, scriptNavigate, isSuccess: true, 
+//         createdAt: { $gt: new Date(Date.now() - 5 * 60 * 1000) } } // 5 Minutes
     
-    const vo = {uuid, level, startTime: new Date()}
+//     const vo = {uuid, level, startTime: new Date()}
 
-    log.info(vo, 'Start searching for cache')                    
-    let cache = await Execution.findOneLean(dataMatch)
-    log.info(vo, 'End searching for cache')                    
+//     log.info(vo, 'Start searching for cache')                    
+//     let cache = await Execution.findOneLean(dataMatch)
+//     log.info(vo, 'End searching for cache')                    
 
-    if (cache) {
-        cache = {...cache, ...vo}
-        delete cache._id
-        cache.endTime = new Date()
-        cache.executionTime = (cache.endTime.getTime() - cache.startTime.getTime()) + 'ms'
-        log.info(cache, 'Cache found, using cached execution')            
-    }
-    return cache
-}
+//     if (cache) {
+//         cache = {...cache, ...vo}
+//         delete cache._id
+//         cache.endTime = new Date()
+//         cache.executionTime = (cache.endTime.getTime() - cache.startTime.getTime()) + 'ms'
+//         log.info(cache, 'Cache found, using cached execution')            
+//     }
+//     return cache
+// }
 
 const executionContextManager = (execution) => {
 
