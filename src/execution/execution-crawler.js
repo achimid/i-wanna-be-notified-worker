@@ -29,8 +29,8 @@ const createExecutionVO = async (exec) => {
 
     if (!exec.options.timeout) exec.options.timeout = process.env.DEFAULT_OPTIONS_TIMEOUT
     if (!exec.options.waitUntil) exec.options.waitUntil = process.env.DEFAULT_OPTIONS_WAIT_UNTIL
-    if (!exec.options.printscreen) exec.options.printscreen = process.env.DEFAULT_OPTIONS_PRINTSCREEN
-    if (!exec.options.printscreenFullPage) exec.options.printscreenFullPage = process.env.DEFAULT_OPTIONS_PRINTSCREEN_FULL_PAGE
+    if (!exec.options.printscreen) exec.options.printscreen = isTrue(process.env.DEFAULT_OPTIONS_PRINTSCREEN)
+    if (!exec.options.printscreenFullPage) exec.options.printscreenFullPage = isTrue(process.env.DEFAULT_OPTIONS_PRINTSCREEN_FULL_PAGE)
    
 
     return exec
@@ -72,7 +72,7 @@ const setUserAgent = async (vo) => {
         log.info(vo, 'UserAgent added')
     } catch (errorOnAddUserAgent) {
         log.info(vo, 'Error on add userAgent', errorOnAddUserAgent)        
-        return {...vo, errorOnAddUserAgent}
+        return {...vo, errorOnAddUserAgent: errorOnAddUserAgent.message}
     }
 
     return {...vo, userAgentRandom}
@@ -87,7 +87,7 @@ const optionsPreGoto = async (vo) => {
             log.info(vo, 'Proxy added')
         } catch (errorOnAddProxy) {
             log.info(vo, 'Error on add proxy', errorOnAddProxy)        
-            return {...vo, errorOnAddProxy}
+            return {...vo, errorOnAddProxy: errorOnAddProxy.message}
         }        
     }
 
@@ -104,7 +104,7 @@ const gotoUrl = async (vo) => {
         log.info(vo, 'Completed access to url', vo.url)    
     } catch (errorOnAccessUrl) {
         log.info(vo, 'Error on accessUrl', errorOnAccessUrl)        
-        return {...vo, errorOnAccessUrl}
+        return {...vo, errorOnAccessUrl: errorOnAccessUrl.message}
     }    
 
     return vo
@@ -146,14 +146,8 @@ const executeScriptTarget = async (vo) => {
         log.info(vo, `ScriptTarget executed with success`)
         return {...vo, extractedTarget}
     } catch (errorOnExecuteScriptTarget) {
-        log.info(vo, `Error on execute ScriptTarget`, errorOnExecuteScriptTarget)
-
-        if (vo.level > 0) {
-            log.info(vo, `ScriptTarget execution ignored because of level`)
-            return {...vo, extractedTarget: '[No Content]'}
-        }
-                
-        return {...vo, errorOnExecuteScriptTarget }
+        log.info(vo, `Error on execute ScriptTarget`, errorOnExecuteScriptTarget)                
+        return {...vo, errorOnExecuteScriptTarget: errorOnExecuteScriptTarget.message }
     }
 }
 
@@ -171,27 +165,27 @@ const executeScriptTargetRetry = async (vo) => {
         return {...vo, extractedTarget}
     } catch (errorOnExecuteScriptTargetRetry) {
         log.info(vo, `Error on execute retry ScriptTarget`, errorOnExecuteScriptTargetRetry)
-        return {...vo, errorOnExecuteScriptTargetRetry }
+        return {...vo, errorOnExecuteScriptTargetRetry: errorOnExecuteScriptTargetRetry.message }
     }
     
 }
 
-const prepareExtractedNavigate = (vo, extractedNavigate) => {
-    if (typeof extractedNavigate === 'string') {
-        if (extractedNavigate.indexOf(',') >= 0){
-            extractedNavigate = extractedNavigate.split(',')
-        } else if (extractedNavigate.indexOf(';') >= 0) {
-            extractedNavigate = extractedNavigate.split(';')
+const filterContainsDomain = (vo, value) => {
+    if (typeof value === 'string') {
+        if (value.indexOf(',') >= 0){
+            value = value.split(',')
+        } else if (value.indexOf(';') >= 0) {
+            value = value.split(';')
         } else {
-            extractedNavigate = [extractedNavigate]
+            value = [value]
         }            
-    } else if (!Array.isArray(extractedNavigate)) {
-        extractedNavigate = []
+    } else if (!Array.isArray(value)) {
+        return value
     }
 
-    extractedNavigate = Array.from(new Set(extractedNavigate))
+    value = Array.from(new Set(value))
 
-    return extractedNavigate
+    return value
         .filter(isURL)
         .filter(l => vo.options.filterDomain ? l.indexOf(getDomainOrigin(vo.url)) >= 0 : true)
 }
@@ -203,14 +197,14 @@ const executeScriptNavigate = async (vo) => {
 
     try {
         const extractedValue = await vo.page.evaluate(vo.scriptNavigate)
-        const extractedNavigate = prepareExtractedNavigate(vo, extractedValue)
+        const extractedNavigate = filterContainsDomain(vo, extractedValue)
         
         log.info(vo, `ScriptNavigate processed`)
 
         return {...vo, extractedNavigate }
     } catch (errorOnExecuteScriptNavigate) {
         log.info(vo, `Erro on execute scriptNavigate`, errorOnExecuteScriptNavigate)
-        return {...vo, errorOnExecuteScriptNavigate }
+        return {...vo, errorOnExecuteScriptNavigate: errorOnExecuteScriptNavigate.message }
     }
 
 }
@@ -272,7 +266,7 @@ const printPage = async (vo) => {
         log.info(vo, `Page printed`)
     } catch (errorOnPrintPage) {
         log.info(vo, `Error on print page`, errorOnPrintPage)
-        return {...vo, errorOnPrintPage}
+        return {...vo, errorOnPrintPage: errorOnPrintPage.message}
     }
        
 
@@ -282,7 +276,7 @@ const printPage = async (vo) => {
         printscreenLink = link
         log.info(vo, `Printscreen uploaded`)        
     } catch (errorOnUploadPrintscreen) {
-        return {...vo, errorOnUploadPrintscreen}
+        return {...vo, errorOnUploadPrintscreen: errorOnUploadPrintscreen.message}
     }
 
     
@@ -311,7 +305,7 @@ const postExecute = async (vo) => {
     const executionTime = (endTime.getTime() - vo.startTime.getTime()) + 'ms'
     log.info(vo, `Execution time: ${executionTime}`)
         
-    vo.extractedTarget = vo.extractedTarget ? vo.extractedTarget.toString() : vo.extractedTarget
+    // vo.extractedTarget = vo.extractedTarget ? vo.extractedTarget.toString() : vo.extractedTarget
     let extractedTargetNormalized = vo.extractedTarget
 
     log.info(vo, `Normalizando responseTarget`)
@@ -325,6 +319,10 @@ const postExecute = async (vo) => {
     log.info(vo, `Gerando hashTarget`)
     const hashTarget = crypto.createHash('md5').update(JSON.stringify({data: extractedTargetNormalized})).digest("hex")    
     
+    vo.extractedContent = vo.extractedContent && vo.extractedContent.length == 0 ? undefined : vo.extractedContent
+
+    if (vo.mode != 'crawler') vo.isLast = true
+
     // Adição de possiveis logs
 
     log.info(vo, `End of execution`)
@@ -347,7 +345,7 @@ const execute = async (exec) => {
         vo = await gotoUrl(vo)
         vo = await optionsPosGoto(vo)
         vo = await executeScriptTarget(vo)
-        vo = await executeScriptTargetRetry(vo)
+        // vo = await executeScriptTargetRetry(vo)
         vo = await executeScriptContent(vo)
         vo = await executeScriptNavigate(vo)
         vo = await postExecuteScriptContent(vo)

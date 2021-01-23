@@ -49,6 +49,8 @@ const startExecution = async (execution) => {
 
 const executionContextManager = (execution) => {
 
+    if (execution.mode != 'crawler') return execution
+
     const ctx = {
         counter: 0,
         urlToExecute: new Array(...(execution.extractedNavigate || [])),
@@ -182,7 +184,11 @@ const saveExecution = async (execution) => {
 }
 
 const notifyExecutionResponse = async (execution) => {
-    producer.postExecutionResponse(execution)
+
+    if (execution.mode == 'crawler') {
+        producer.postExecutionResponse(execution)
+    }
+
     return execution
 }
 

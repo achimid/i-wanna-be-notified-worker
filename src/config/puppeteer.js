@@ -21,6 +21,7 @@ const browserInit = async () => {
                 '--ignore-certifcate-errors',
                 '--ignore-certifcate-errors-spki-list',
                 '--disable-dev-shm-usage',
+                '--window-size=1024,768',
                 proxy ? `--proxy-server=${proxy}` : ''
             ],
             userDataDir: '/tmp/pp'

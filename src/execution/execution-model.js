@@ -67,7 +67,7 @@ const schema = mongoose.Schema({
         type: Boolean
     },
     extractedTarget: {
-        type: String
+        type: Object
     },
     extractedContent: {
         type: [{ type: Object }],
