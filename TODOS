@@ -1,5 +1,3 @@
 - Melhor o README.md
 
-- Adicionar configuração para excluir o a execution, não armazenando nenhum registro, como se fosse uma execução temporária.
 
-- Pensar de alguma maneira de paralelizar as requisiçoes do crawler com outros worker. Pegar um pedacinho da lista e enviar para os outros worker executar, quando estiver pronto, tem que receber a requisição de alguma maneira.
