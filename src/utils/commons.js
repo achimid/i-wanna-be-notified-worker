@@ -41,7 +41,7 @@ const isTrue = (v) => v == 'true' || v == true
 
 const isFalse = (v) => v == 'false' || v == false || v == '' || v == undefined || v == null
 
-const getDomainOrigin = (v) => new URL(v).origin
+const getDomainOrigin = (v) => new URL(v).hostname
 
 module.exports = {
     isTrue,

@@ -5,7 +5,7 @@ const main = async () => {
     await require('./src/config/database').databaseInit()
 
     const { execute } = require('./src/execution/execution-scraper')
-    const { startExecution } = require('./src/execution/execution-service')
+    const { consumeIncoming } = require('./src/execution/execution-service')
 
     // {
     //     name: document.querySelector('.post-title').innerText.split('–')[0],
@@ -16,17 +16,9 @@ const main = async () => {
     // JSON.stringify({name: document.querySelector('.post-title').innerText.split('–')[0], number: 'Episódio ' + document.querySelector('.post-title').innerText.split('–')[1], url: window.location.href})
 
     let data = {
-        "scriptContent": [
-            "JSON.stringify({name: document.querySelector('.post-title').innerText.split('–')[0], number: 'Episódio ' + document.querySelector('.post-title').innerText.split('–')[1], url: window.location.href})",
-            "[...document.querySelectorAll('.post-title a')].filter(a => a.innerText.indexOf('–') > 0).map(a => a.href)"
-        ],
-        "url": "https://elite.fansubs.com.br/2020/11/02/hinamatsuri-bd-vol1/",
-        "name": "Elite Fansub",
-        "regularity": "*/1 * * * *",
-        "scriptTarget": "'[none]'",
+        "url": "http://animestc.com/",
         "options": {
-            "levelMax": 1,
-            "temporary": true
+            "proxy": "socks5://achimid.ddns.net:9028"
         }
     }
     // "url": "https://i-wanna-be-notified-catalog.herokuapp.com/api/v1/log",
@@ -47,7 +39,7 @@ const main = async () => {
 
     
 
-    startExecution(data)
+    consumeIncoming(data)
         .then(console.log)
         .catch(console.error)
 

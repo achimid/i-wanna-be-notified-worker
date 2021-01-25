@@ -50,6 +50,7 @@ const startExecution = async (execution) => {
 const executionContextManager = (execution) => {
 
     if (execution.mode != 'crawler') return execution
+    if (execution.extractedNavigate.length <= 0) return execution
 
     const ctx = {
         counter: 0,
