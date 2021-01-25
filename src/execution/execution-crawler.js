@@ -68,7 +68,7 @@ const setUserAgent = async (vo) => {
 
     try {
         log.info(vo, 'Adding userAgent')
-        await vo.page.setUserAgent(userAgentRandom)    
+        await vo.page.setUserAgent('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)')    
         log.info(vo, 'UserAgent added')
     } catch (errorOnAddUserAgent) {
         log.info(vo, 'Error on add userAgent', errorOnAddUserAgent)        
