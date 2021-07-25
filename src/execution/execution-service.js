@@ -1,8 +1,9 @@
-const log = require('../logger/logger')
+const log = require('../utils/logger')
+const commons = require('../utils/commons')
 const Execution = require('./execution-model')
 const crawler = require('./execution-crawler')
 const producer = require('./execution-producer')
-const commons = require('../utils/commons')
+
 
 const { onExecutionResponse } = require('./execution-consumer-dynamic')
 const { removeQueueByExecution } = require('../utils/queue')

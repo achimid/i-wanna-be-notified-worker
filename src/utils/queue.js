@@ -1,5 +1,4 @@
 const fetch = require('node-fetch')
-const { remove } = require('../logger/log-model')
 
 let conn = null
 

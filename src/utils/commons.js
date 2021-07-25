@@ -1,6 +1,6 @@
 const Fuse = require('fuse.js')
 const natural = require('natural')
-const log = require('../logger/logger')
+const log = require('../utils/logger')
 const tokenizer = new natural.WordTokenizer()
 
 const findSimilarity = (uuid, fullText, wordsSearch, threshold = 0.1) => {

@@ -1,4 +1,5 @@
-const log = require('../logger/logger')
+const log = require('../utils/logger')
+
 const { v4 } = require('uuid')
 const crypto = require('crypto')
 const fetch = require('node-fetch')

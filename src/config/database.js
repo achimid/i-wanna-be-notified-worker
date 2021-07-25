@@ -22,20 +22,6 @@ const connect = (name, uri) => {
     return mongoose.connection
 }
 
-const createConnectionLog = () => {
-    console.info(`[Log] Iniciando banco de dados...`)
-
-    const connection = mongoose.createConnection(process.env.MONGO_DB_CONNECTION_LOG, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useCreateIndex: true,
-        useFindAndModify: false
-    })
-
-    handleConnection('Log', connection)    
-
-    return connection
-}
 
 const databaseInit = async () => {
 
@@ -45,6 +31,5 @@ const databaseInit = async () => {
 }
 
 module.exports = {
-    databaseInit,
-    createConnectionLog
+    databaseInit
 }
