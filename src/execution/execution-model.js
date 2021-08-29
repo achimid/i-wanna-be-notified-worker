@@ -45,6 +45,7 @@ const schema = mongoose.Schema({
         printscreenFullPage: { type: Boolean },
         levelMax: { type: Number },
         proxy: { type: String },
+        temporary: { type: Boolean },
         filterDomain: { type: Boolean }
     },
     filter: {
