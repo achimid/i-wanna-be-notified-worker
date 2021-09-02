@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const log = require('../utils/logger')
 const commons = require('../utils/commons')
 const Execution = require('./execution-model')
@@ -14,11 +15,31 @@ const consumeExecution = (data) => startExecution(data)
 
 const startExecution = async (execution) => {
     return crawler.execute(execution)
-        .then(applyFilter)
-        .then(applyChangedUnique)
-        .then(saveExecution)
-        .then(notifyExecutionCompleted)
-        .then(notifyExecutionResponse)
+            .then(isSplitable)
+            .then(eList => Promise.all(eList.map(e => Promise.resolve(e)
+            .then(applyFilter)
+            .then(applyChangedUnique)
+            .then(saveExecution)
+            .then(notifyExecutionCompleted)
+            .then(notifyExecutionResponse)
+        )))
+}
+
+const isSplitable = (execution) => {
+    if (execution.extractedTarget && Array.isArray(execution.extractedTarget) 
+        && !!execution.extractedTarget.length && execution.options.splitable) {
+        
+            log.info(execution, `Spliting execution into a list`)
+            return execution.extractedTarget.filter(e => e).map(extractedTarget => { 
+                
+                log.info(execution, `Gerando hashTarget`)
+                const hashTarget = crypto.createHash('md5').update(JSON.stringify({ data: extractedTarget })).digest("hex")    
+                
+                return { ...execution, hashTarget, extractedTarget }
+            })
+    }
+
+    return [execution]
 }
 
 // const execute = async (execution) => {
@@ -48,9 +69,12 @@ const startExecution = async (execution) => {
 //     return cache
 // }
 
-const executionContextManager = (execution) => {
+const executionContextManager = (executions) => {
+
+    const execution = executions.shift()
 
     if (execution.mode != 'crawler') return execution
+    if (execution.options.splitable) return execution
     if (execution.extractedNavigate.length <= 0) return execution
 
     const ctx = {
