@@ -17,7 +17,8 @@ const schema = mongoose.Schema({
         default: undefined    
     },
     uuid: { 
-        type: String
+        type: String,
+        index: true
     },
     monitoringId: { 
         type: String
@@ -60,7 +61,8 @@ const schema = mongoose.Schema({
         type: Boolean 
     },
     hashTarget: {
-        type: String
+        type: String,
+        index: true
     },
     hashTargetChanged: {
         type: Boolean
