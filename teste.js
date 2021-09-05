@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
       args: [ '--proxy-server=socks4://114.23.223.220:5678' ]
     });
   const page = await browser.newPage();
-  await page.goto('https://www.animestc.net/');
+  await page.goto('https://www.cartacapital.com.br/cartaexpressa/');
   const value = await page.evaluate(`
     new Promise((resolve) =>
         fetch("https://api2.animestc.com/episodes?order=created_at&direction=desc&page=1&ignoreIndex=false", {
