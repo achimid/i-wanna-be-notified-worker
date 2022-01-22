@@ -35,7 +35,7 @@
     "mquery": ">=3.2.3",
     "natural": "^2.1.5",
     "node-cron": "^2.0.3",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "puppeteer": "^5.2.0",
     "puppeteer-extra": "^3.1.12",
     "puppeteer-extra-plugin-adblocker": "^2.11.5",
