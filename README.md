@@ -27,3 +27,10 @@ Este projeto é dividido em diversos micro-serviço, acesse outros repositório 
 * [i-wanna-be-notified-notify](https://github.com/achimid/i-wanna-be-notified-notify)
 * [i-wanna-be-notified-catalog](https://github.com/achimid/i-wanna-be-notified-catalog)
 * [i-wanna-be-notified-scripts](https://github.com/achimid/i-wanna-be-notified-scripts)
+
+## Comandos Docker
+
+Criando imagem docker e rodando container
+  docker build -t achimid/i-worker .
+  docker container run --name i-worker --network host -p 9002:9002 achimid/i-worker
+
