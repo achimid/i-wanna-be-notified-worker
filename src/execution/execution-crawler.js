@@ -4,7 +4,7 @@ const { v4 } = require('uuid')
 const crypto = require('crypto')
 const fetch = require('node-fetch')
 const ImagemUtils = require('../utils/imagem-util')
-const RandomHttpUserAgent = require('random-http-useragent')
+const randomUseragent = require('random-useragent')
 const useProxy = require('puppeteer-page-proxy')
 const {isTrue, isFalse, isURL, getDomainOrigin} = require('../utils/commons')
 
@@ -64,7 +64,7 @@ const setUserAgent = async (vo) => {
 
     log.info(vo, 'Setting UserAgentRandom')
     
-    const userAgentRandom = await RandomHttpUserAgent.get()
+    const userAgentRandom = randomUseragent.getRandom()
     log.info(vo, 'UserAgent created', userAgentRandom)
 
     try {
