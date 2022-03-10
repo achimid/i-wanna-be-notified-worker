@@ -23,7 +23,7 @@ module.exports = {
         }
 
         try {
-            queue.sendToQueue("LOG", { startTime: vo.startTime, log, extra, executionTime, level, uuid })    
+            queue.sendToQueue("LOG", { startTime: vo.startTime, log, extra, executionTime, level, uuid, url: vo.url })    
         } catch (error) {
             console.error('Error on send log to producer', error)
         }
