@@ -103,7 +103,6 @@ const consumeFromQueue = (queueName, callbackPromise, prefetch, autoDelete) => {
 		
 
     consumerStrategy(queueName, (message, ack) => {
-		var transaction = newrelic.getTransaction()
 		if (autoDelete) {
         	try {
 				const data = JSON.parse(message.content.toString())
