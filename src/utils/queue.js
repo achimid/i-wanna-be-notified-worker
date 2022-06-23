@@ -1,4 +1,5 @@
 const fetch = require('node-fetch')
+const newrelic = require('newrelic')
 
 let conn = null
 
@@ -103,6 +104,7 @@ const consumeFromQueue = (queueName, callbackPromise, prefetch, autoDelete) => {
 		
 
     consumerStrategy(queueName, (message, ack) => {
+		var transaction = newrelic.getTransaction()
 		if (autoDelete) {
         	try {
 				const data = JSON.parse(message.content.toString())
@@ -111,6 +113,7 @@ const consumeFromQueue = (queueName, callbackPromise, prefetch, autoDelete) => {
 				errorOnConsume(message)(error)
 			} finally {
 				ack()
+				transaction.end()
 			}
 		} else {
 			try {
@@ -121,6 +124,7 @@ const consumeFromQueue = (queueName, callbackPromise, prefetch, autoDelete) => {
 			} catch (error) {
 				errorOnConsume(message)(error)
 				ack()
+				transaction.end()
 			}			
 		}
     }, prefetch)
