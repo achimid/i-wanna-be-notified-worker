@@ -1,5 +1,4 @@
 const fetch = require('node-fetch')
-const newrelic = require('newrelic')
 
 let conn = null
 
@@ -113,7 +112,6 @@ const consumeFromQueue = (queueName, callbackPromise, prefetch, autoDelete) => {
 				errorOnConsume(message)(error)
 			} finally {
 				ack()
-				transaction.end()
 			}
 		} else {
 			try {
@@ -124,7 +122,6 @@ const consumeFromQueue = (queueName, callbackPromise, prefetch, autoDelete) => {
 			} catch (error) {
 				errorOnConsume(message)(error)
 				ack()
-				transaction.end()
 			}			
 		}
     }, prefetch)
