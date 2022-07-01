@@ -103,4 +103,6 @@ const schema = mongoose.Schema({
     errorOnAccessUrl: { type: Object }
 }, { versionKey: false, timestamps: true })
 
+schema.index({ url: 1, monitoringId: 1, level: 1})
+
 module.exports = mongoose.model('executions', schema, config)
